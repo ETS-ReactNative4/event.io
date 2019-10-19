@@ -33,12 +33,10 @@ target 'Test' do
   pod 'DoubleConversion', :podspec => '../node_modules/react-native/third-party-podspecs/DoubleConversion.podspec'
   pod 'glog', :podspec => '../node_modules/react-native/third-party-podspecs/glog.podspec'
   pod 'Folly', :podspec => '../node_modules/react-native/third-party-podspecs/Folly.podspec'
-  pod 'RNFS', :path => '../node_modules/react-native-fs'
-
-  pod 'react-native-camera', :path => '../node_modules/react-native-camera'
 
 
-  pod 'RNGestureHandler', :path => '../node_modules/react-native-gesture-handler'
+
+
 
   target 'TestTests' do
     inherit! :search_paths

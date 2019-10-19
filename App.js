@@ -1,13 +1,12 @@
 import React from 'react';
-import {
-  StyleSheet,
-  TouchableWithoutFeedback,
-  Keyboard,
-  View,
-} from 'react-native';
-import Navigator from './components/Navigator';
+import { StyleSheet, View } from 'react-native';
+import Navigator from './src/components/Navigator';
 
 class App extends React.Component {
+  componentDidMount() {
+    console.disableYellowBox = true;
+  }
+
   render() {
     return (
       <View style={styles.innerView}>

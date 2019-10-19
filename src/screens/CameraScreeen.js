@@ -4,7 +4,7 @@ import React, { PureComponent } from 'react';
 import { StyleSheet, TouchableOpacity, View } from 'react-native';
 import { RNCamera } from 'react-native-camera';
 import Icon from 'react-native-vector-icons/Ionicons';
-import PageView from './PageView';
+import PageView from '../components/PageView';
 export default class CameraView extends PureComponent {
   state = {
     flash: false,
