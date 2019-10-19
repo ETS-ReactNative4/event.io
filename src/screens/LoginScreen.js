@@ -1,10 +1,24 @@
 import React, { Component } from 'react';
-import { Alert, Button, StyleSheet, Text, View } from 'react-native';
-import Auth0 from 'react-native-auth0';
+import {
+  Alert,
+  Button,
+  StyleSheet,
+  Text,
+  View,
+  TouchableOpacity,
+  KeyboardAvoidingView,
+} from 'react-native';
 
+import BaseTextInput from '../components/BaseTextInput';
+import PageView from '../components/PageView';
+import Auth0 from 'react-native-auth0';
 var credentials = require('../auth/credentials');
 const auth0 = new Auth0(credentials);
+
 class Login extends Component {
+  static navigationOptions = {
+    title: 'Login',
+  };
   constructor(props) {
     super(props);
     this.state = { accessToken: null };
@@ -35,31 +49,57 @@ class Login extends Component {
   };
 
   render() {
-    let loggedIn = this.state.accessToken === null ? false : true;
     return (
-      <View style={styles.container}>
-        <Text style={styles.header}> Auth0Sample - Login </Text>
-        <Text>You are {loggedIn ? '' : 'not '} logged in . </Text>
-        <Button
-          onPress={loggedIn ? this._onLogout : this._onLogin}
-          title={loggedIn ? 'Log Out' : 'Log In'}
-        />
-      </View>
+      <PageView style={styles.container}>
+        <View style={styles.loginContainer}>
+          <Text style={styles.header}>Login</Text>
+          <BaseTextInput
+            autoCompleteType="username"
+            style={styles.input}
+            placeholder="Username"
+          />
+          <BaseTextInput
+            secureTextEntry={true}
+            autoCompleteType="password"
+            style={styles.input}
+            placeholder="Password"
+          />
+          <TouchableOpacity style={styles.loginBtn} onPress={this._onLogin}>
+            <Text style={styles.loginTxt}>Log In</Text>
+          </TouchableOpacity>
+          <View style={{ flexDirection: 'row', alignItems: 'center' }}>
+            <Text>Don't have an account?</Text>
+            <Button title="Sign Up" />
+          </View>
+        </View>
+      </PageView>
     );
   }
 }
 
 const styles = StyleSheet.create({
   container: {
+    marginTop: '10%',
     flex: 1,
-    justifyContent: 'center',
-    alignItems: 'center',
-    backgroundColor: '#F5FCFF',
   },
+  loginContainer: {},
   header: {
-    fontSize: 20,
-    textAlign: 'center',
-    margin: 10,
+    fontSize: 32,
+    marginBottom: 64,
+  },
+  input: {
+    paddingBottom: '5%',
+    borderBottomWidth: 1,
+    borderBottomColor: 'gray',
+  },
+  loginBtn: {
+    padding: '3%',
+    backgroundColor: 'lightblue',
+    borderRadius: 12,
+  },
+  loginTxt: {
+    fontSize: 16,
+    //color: 'white',
   },
 });
 
