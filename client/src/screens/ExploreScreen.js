@@ -4,11 +4,15 @@ import MapView, { Marker, Callout } from 'react-native-maps';
 import Icon from '../components/Icon';
 import Geolocation from '@react-native-community/geolocation';
 import OptionsBar from '../components/OptionsBar';
+import AuthContext from '../context/AuthContext';
+import credentials from '../auth/credentials';
 
 export default class Home extends React.Component {
   static navigationOptions = {
     title: 'Explore',
   };
+  static contextType = AuthContext;
+
   state = {
     posts: [],
     position: {
@@ -16,12 +20,8 @@ export default class Home extends React.Component {
       latitude: 32,
     },
   };
+
   componentDidMount = () => {
-    fetch('http://localhost:3001/api/posts').then(res => {
-      res.json().then(data => {
-        console.log('DATA', data);
-      });
-    });
     Geolocation.getCurrentPosition(
       pos => {
         this.setState({
@@ -52,9 +52,18 @@ export default class Home extends React.Component {
     });
   };
 
+  logout = async () => {
+    this.context.auth0.webAuth
+      .clearSession({ clientId: credentials.clientId })
+      .then(success => {
+        this.props.navigation.replace('Login');
+      });
+  };
+
   center = () => {
     this.map.animateToRegion(this.state.position, 500);
   };
+
   render() {
     const { position } = this.state;
     return (
@@ -101,6 +110,7 @@ export default class Home extends React.Component {
           onCenterPress={this.center}
           leftIconName="menu"
           rightIconName="contact"
+          onRightPress={this.logout}
         />
       </View>
     );

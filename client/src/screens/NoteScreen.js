@@ -10,7 +10,6 @@ export default class NoteView extends React.Component {
   static navigationOptions = {
     title: 'Post',
   };
-
   state = {
     title: 'Untitled',
     body: '',
