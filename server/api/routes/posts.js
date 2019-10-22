@@ -3,7 +3,7 @@ const db = require('../models');
 const jwtCheck = require('../middleware/jwtCheck');
 
 router.get('/', jwtCheck, async (req, res) => {
-  const posts = await db.Post.find({}).populate('user');
+  const posts = await db.Post.find({ user: req.user.uid }).populate('user');
   res.json(posts);
 });
 

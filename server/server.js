@@ -9,11 +9,14 @@ app.use(express.urlencoded({ extended: true }));
 app.use(express.json());
 app.use('/auth', require('./api/routes/auth'));
 app.use('/posts', require('./api/routes/posts'));
+app.use('/friends', require('./api/routes/friends'));
+
 mongoose.connect(MONGO_URI, {
   useNewUrlParser: true,
   useUnifiedTopology: true,
   useCreateIndex: true
 });
+
 const connection = mongoose.connection;
 connection.on('error', console.error.bind(console, 'MongoDB connection error:'));
 app.listen(PORT, () => console.log('app listening on port', PORT));
