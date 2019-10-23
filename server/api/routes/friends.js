@@ -1,19 +1,62 @@
-const router = require('express').Router();
-const db = require('../models');
-const jwtCheck = require('../middleware/jwtCheck');
+const router = require('express').Router()
+const db = require('../models')
+const authCheck = require('../middleware/jwtCheck')
 
-router.get('/', jwtCheck, async (req, res, next) => {
-  const friends = db.Friends.find({ user: req.user.uid }).populate('user');
-  res.json(friends);
-});
+// get list of friendssw
+router.get('/', authCheck, async (req, res) => {
+  try {
+    const friends = await db.FriendRequest.find()
+      .or([{ from: req.user.uid, accepted: true }, { to: req.user.uid, accepted: true }])
+      .populate('from to', '-email -password')
+    res.json(friends)
+  } catch (err) {
+    console.error(err)
+    res.json.status(500).end()
+  }
+})
 
-router.get('/requests', jwtCheck, (req, res) => {
-  const friendRequests = db.FriendRequest.find({ user: req.user.uid }).populate('user');
-});
+// get all your friend requests
+router.get('/requests', authCheck, async (req, res) => {
+  try {
+    const friendRequests = await db.FriendRequest.find()
+      .or([{ from: req.user.uid }, { to: req.user.uid }])
+      .populate('from to', '-password -email')
+    res.json(friendRequests)
+  } catch (err) {
+    console.error(err)
+    res.json.status(500).end()
+  }
+})
 
-router.post('/requests', jwtCheck, (req, res) => {
-  const { to } = req.body;
-  db.FriendRequest.create({ to, from: req.user.uid, accepted: false });
-});
+// send a friend req
+router.post('/requests', authCheck, async (req, res) => {
+  try {
+    const { to } = req.body
+    const exists = await db.FriendRequest.findOne({ to, from: req.user.id })
+    if (exists) return res.json({ message: 'request already sent' })
+    const friendRequest = await db.FriendRequest.create({ to, from: req.user.uid, accepted: false })
+    res.json(friendRequest)
+  } catch (err) {
+    console.error(err)
+    res.json.status(500).end()
+  }
+})
 
-module.exports = router;
+// accept or decline friend req
+router.post('/requests/:id', authCheck, async (req, res) => {
+  try {
+    const { accepted } = req.body
+    if (!accepted) {
+      db.FriendRequest.deleteOne({ _id: req.params.id, to: req.user.uid })
+      res.json({ message: 'Request has been declined' })
+    } else {
+      db.FriendRequest.updateOne({ _id: req.params.id, to: req.user.uid, accepted: true })
+      res.json({ message: 'Request has been approved' })
+    }
+  } catch (err) {
+    console.error(err)
+    res.json.status(500).end()
+  }
+})
+
+module.exports = router
