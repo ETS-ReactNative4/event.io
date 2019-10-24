@@ -1,20 +1,20 @@
 import React, { Component } from 'react';
-import Auth0 from 'react-native-auth0';
-import credentials from '../auth/credentials';
 
 const AuthContext = React.createContext();
 
 export class AuthProvider extends Component {
   constructor(props) {
     super(props);
-    const auth = new Auth0(credentials);
     this.state = {
-      auth0: auth,
       user: null,
       token: null,
       loggedIn: false,
-      setState: state => {
-        this.setState(state);
+      login: async (email, password) => {
+        const token = await fetch('http://localhost:3000/auth/login', {
+          method: 'post',
+          body: JSON.stringify({ email, password }),
+        });
+        this.setState({ token });
       },
     };
   }
