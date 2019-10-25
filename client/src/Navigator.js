@@ -6,6 +6,7 @@ import CameraScreen from './screens/CameraScreeen';
 import NotesDetailsScreen from './screens/NoteDetailsScreen';
 import RegisterScreen from './screens/RegisterScreen';
 import LoginScreen from './screens/LoginScreen';
+import SettingsScreen from './screens/SettingsScreen';
 const AppNavigator = createStackNavigator(
   {
     Explore: {
@@ -25,6 +26,9 @@ const AppNavigator = createStackNavigator(
     },
     Register: {
       screen: RegisterScreen,
+    },
+    Settings: {
+      screen: SettingsScreen,
     },
   },
   {

@@ -21,7 +21,10 @@ export default class Home extends React.Component {
     },
   };
 
-  componentDidMount = () => {
+  componentDidMount = async () => {
+    const res = await this.context.get('http://localhost:3000/auth/protected');
+    const data = await res.json();
+    console.log(data);
     Geolocation.getCurrentPosition(
       pos => {
         this.setState({
@@ -53,11 +56,8 @@ export default class Home extends React.Component {
   };
 
   logout = async () => {
-    this.context.auth0.webAuth
-      .clearSession({ clientId: credentials.clientId })
-      .then(success => {
-        this.props.navigation.replace('Login');
-      });
+    this.context.logout();
+    this.props.navigation.replace('Login');
   };
 
   center = () => {
@@ -108,9 +108,9 @@ export default class Home extends React.Component {
         <OptionsBar
           centerIconName="locate"
           onCenterPress={this.center}
-          leftIconName="menu"
-          rightIconName="contact"
-          onRightPress={this.logout}
+          leftIconName="contact"
+          rightIconName="settings"
+          onRightPress={() => this.props.navigation.navigate('Settings')}
         />
       </View>
     );

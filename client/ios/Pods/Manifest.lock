@@ -1,5 +1,5 @@
 PODS:
-  - A0Auth0 (2.0.0):
+  - A0Auth0 (2.1.0):
     - React
   - boost-for-react-native (1.63.0)
   - DoubleConversion (1.1.6)
@@ -283,7 +283,7 @@ DEPENDENCIES:
   - Yoga (from `../node_modules/react-native/ReactCommon/yoga`)
 
 SPEC REPOS:
-  https://github.com/cocoapods/specs.git:
+  trunk:
     - boost-for-react-native
 
 EXTERNAL SOURCES:
@@ -357,7 +357,7 @@ EXTERNAL SOURCES:
     :path: "../node_modules/react-native/ReactCommon/yoga"
 
 SPEC CHECKSUMS:
-  A0Auth0: be47043e0129522a58d179d971ca86a444b52512
+  A0Auth0: 351b3b07e58db39b3bb33f58acf35a878fbba74d
   boost-for-react-native: 39c7adb57c4e60d6c5479dd8623128eb5b3f0f2c
   DoubleConversion: 5805e889d232975c086db112ece9ed034df7a0b2
   FBLazyVector: 68b6a76960fbd8ecd9fb7ce0aadd3329c3340a99
@@ -373,10 +373,10 @@ SPEC CHECKSUMS:
   React-jsi: 32285a21b1b24c36060493ed3057a34677d58d09
   React-jsiexecutor: 8909917ff7d8f21a57e443a866fd8d4560e50c65
   React-jsinspector: 111d7d342b07a904c400592e02a2b958f1098b60
-  react-native-camera: 92877108e4c4d1d5a3f1c6f8733f1877ab1e8c1a
-  react-native-geolocation: c956aeb136625c23e0dce0467664af2c437888c9
+  react-native-camera: 2815acff3b2c3bf8b5c78a80aad62398a91051f4
+  react-native-geolocation: cbd9d6bd06bac411eed2671810f454d4908484a8
   react-native-maps: 6e499eee4eabf422ba8b6f94e993cc768bf35153
-  react-native-voice: 9829ac5dc9300687c5f215bddf6c9645e82923fc
+  react-native-voice: 0253a5cde07d9c675463e36f7e668a76b0825de4
   React-RCTActionSheet: 89b037c0fb7d2671607cb645760164e7e0c013f6
   React-RCTAnimation: e3cefa93c38c004c318f7ec04b883eb14b8b8235
   React-RCTBlob: d26ac0e313fbf14e7203473fd593ccaaeee8329e
@@ -387,12 +387,12 @@ SPEC CHECKSUMS:
   React-RCTText: e3ef6191cdb627855ff7fe8fa0c1e14094967fb8
   React-RCTVibration: fb54c732fd20405a76598e431aa2f8c2bf527de9
   ReactCommon: 5848032ed2f274fcb40f6b9ec24067787c42d479
-  RNCAsyncStorage: 60a80e72d95bf02a01cace55d3697d9724f0d77f
+  RNCAsyncStorage: 5ae4d57458804e99f73d427214442a6b10a53856
   RNFS: a8fbe7060fa49157d819466404794ad9c58e58cf
   RNGestureHandler: 4cb47a93019c1a201df2644413a0a1569a51c8aa
   RNVectorIcons: 0bb4def82230be1333ddaeee9fcba45f0b288ed4
   Yoga: 14927e37bd25376d216b150ab2a561773d57911f
 
-PODFILE CHECKSUM: 0bca08f09ba3a23fb6468c8269e07caa3c7850ca
+PODFILE CHECKSUM: 67728b6ef95bece33394ad674e06ee8615c5f6c1
 
-COCOAPODS: 1.6.1
+COCOAPODS: 1.8.4

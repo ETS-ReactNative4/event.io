@@ -5,7 +5,10 @@ const FormGroup = props => {
   return (
     <View style={styles.formGroup}>
       <Text style={styles.formLabel}>{props.label}</Text>
-      <BaseTextInput {...props} style={styles.formInput}></BaseTextInput>
+      <BaseTextInput
+        {...props}
+        autoCapitalize="none"
+        style={styles.formInput}></BaseTextInput>
     </View>
   );
 };

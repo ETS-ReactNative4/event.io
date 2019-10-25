@@ -3,7 +3,10 @@
   "version": "0.3.0",
   "summary": "React Native Native Voice library for iOS and Android",
   "license": "MIT",
-  "authors": "Sam Wenke <samwenke@gmail.com>",
+  "authors": {
+    "name": "Sam Wenke",
+    "email": "samwenke@gmail.com"
+  },
   "homepage": "https://github.com/react-native-community/react-native-voice",
   "platforms": {
     "ios": "9.0"
