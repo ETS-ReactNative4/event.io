@@ -5,7 +5,6 @@ import Icon from '../components/Icon';
 import Geolocation from '@react-native-community/geolocation';
 import OptionsBar from '../components/OptionsBar';
 import AuthContext from '../context/AuthContext';
-import credentials from '../auth/credentials';
 
 export default class Home extends React.Component {
   static navigationOptions = {
@@ -18,8 +17,8 @@ export default class Home extends React.Component {
       fontWeight: 'bold',
     },
   };
-  static contextType = AuthContext;
 
+  static contextType = AuthContext;
   state = {
     posts: [],
     position: {
@@ -29,9 +28,6 @@ export default class Home extends React.Component {
   };
 
   componentDidMount = async () => {
-    const res = await this.context.get('http://localhost:3000/auth/protected');
-    const data = await res.json();
-    console.log(data);
     Geolocation.getCurrentPosition(
       pos => {
         this.setState({

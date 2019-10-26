@@ -27,7 +27,6 @@ router.get('/requests', authCheck, async (req, res) => {
     res.json.status(500).end()
   }
 })
-
 // send a friend req
 router.post('/requests', authCheck, async (req, res) => {
   try {

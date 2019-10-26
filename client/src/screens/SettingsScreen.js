@@ -41,14 +41,19 @@ export default class SettingsScreen extends React.Component {
           onPress: () => console.log('change username'),
         },
         {
-          icon: 'navigate',
-          title: 'Hide location',
-          onPress: () => console.log('hiding location'),
-        },
-        {
           icon: 'exit',
           title: 'Logout',
           onPress: this.logout,
+        },
+      ],
+    },
+    {
+      title: 'Privacy',
+      data: [
+        {
+          icon: 'navigate',
+          title: 'Hide location',
+          onPress: () => console.log('hiding location'),
         },
       ],
     },

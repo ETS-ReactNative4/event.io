@@ -6,10 +6,18 @@ import { View, Text, Alert } from 'react-native';
 
 export default class RegisterForm extends React.Component {
   validate = () => {
+    if (
+      !this.email ||
+      !this.username ||
+      !this.password ||
+      !this.confirmPassword
+    ) {
+      return Alert.alert('Please fill in all fields');
+    }
     if (this.password !== this.confirmPassword) {
       return Alert.alert('Passwords must match');
     } else {
-      this.props.onRegister(this.email, this.username, this.password);
+      this.props.onRegister(this.email, this.password, this.username);
     }
   };
 

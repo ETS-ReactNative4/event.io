@@ -55,7 +55,7 @@
 	<key>NSCameraUsageDescription</key>
 	<string>Your own description of the purpose</string>
 	<key>NSLocationWhenInUseUsageDescription</key>
-	<string></string>
+	<string>Description</string>
 	<key>NSMicrophoneUsageDescription</key>
 	<string>Description of why you require the use of the microphone</string>
 	<key>NSSpeechRecognitionUsageDescription</key>

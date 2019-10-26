@@ -44,9 +44,8 @@ class LoginScreen extends Component {
       }),
     });
     if (res.ok) {
-      this.props.navigation.navigate('Login');
       const data = await res.json();
-      console.log(data);
+      this.toggleLogin();
     } else {
       console.log('error registering');
       const data = await res.json();
