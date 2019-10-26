@@ -1,5 +1,5 @@
 import React from 'react';
-import { StyleSheet, Text, View } from 'react-native';
+import { StyleSheet, Text, View, Switch } from 'react-native';
 import Slider from 'react-native-slider';
 import BaseMultiLineTextInput from '../components/BaseMultilineTextInput';
 import BaseTextInput from '../components/BaseTextInput';
@@ -53,6 +53,17 @@ export default class NoteView extends React.Component {
             style={styles.titleContainer}
             onChangeText={this.props.onTitleChange}
           />
+          <View
+            style={{
+              flexDirection: 'row',
+              alignItems: 'center',
+              marginLeft: 'auto',
+            }}>
+            <Text style={[styles.expiryLabel, { marginRight: 12 }]}>
+              Public
+            </Text>
+            <Switch value={true} />
+          </View>
           <BaseMultiLineTextInput
             returnKeyType="done"
             style={styles.bodyContainer}
@@ -61,14 +72,17 @@ export default class NoteView extends React.Component {
             onContentSizeChange={this.onBodySizeChange}
             onEndEditing={this.props.onBodyEndEditing}
           />
-          <Text style={styles.expiryLabel}>
-            Expires in {this.state.expiryDate}
-          </Text>
-          <Slider
-            onValueChange={this.onExpiryDateChange}
-            step={1}
-            maximumValue={4}
-          />
+          <View style={{ flexDirection: 'row', alignItems: 'center' }}>
+            <Text style={styles.expiryLabel}>
+              Expires in {this.state.expiryDate}
+            </Text>
+            <Slider
+              style={{ flex: 1 }}
+              onValueChange={this.onExpiryDateChange}
+              step={1}
+              maximumValue={4}
+            />
+          </View>
         </PageView>
         <OptionsBar
           rightIconName="camera"

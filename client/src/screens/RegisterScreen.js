@@ -1,7 +1,8 @@
 import React, { Component } from 'react';
 import ImagePage from '../components/ImagePage';
 import { Button, View, StyleSheet } from 'react-native';
-import FormGroup from '../components/FormGroup';
+import FormGroup from '../components/FormInput';
+import img from '../assets/register.jpg';
 export default class RegisterScreen extends Component {
   static navigationOptions = {
     title: 'Register',
@@ -35,7 +36,7 @@ export default class RegisterScreen extends Component {
   };
   render() {
     return (
-      <ImagePage src="https://www.pixelstalk.net/wp-content/uploads/2016/11/iPhone-Fish-Wallpapers.jpg">
+      <ImagePage src={img}>
         <View style={styles.container}>
           <FormGroup
             label="Email"

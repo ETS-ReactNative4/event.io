@@ -34,14 +34,14 @@ const styles = StyleSheet.create({
   icon: {
     fontSize: 32,
     width: 32,
-    color: '#393f4d',
+    color: '#ddd',
   },
   btn: {
     paddingBottom: 10,
     paddingTop: 10,
   },
   optionsBar: {
-    backgroundColor: 'white',
+    backgroundColor: '#111',
     alignItems: 'center',
     borderTopWidth: 1,
     borderTopColor: 'lightgray',

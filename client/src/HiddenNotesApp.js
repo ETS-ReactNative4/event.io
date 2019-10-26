@@ -1,5 +1,5 @@
 import React from 'react';
-import Navigator from './Navigator';
+import Navigator from './screens';
 
 class App extends React.Component {
   componentDidMount() {

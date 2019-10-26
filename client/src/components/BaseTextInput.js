@@ -17,6 +17,5 @@ export default function BaseTextInput(props) {
 const styles = StyleSheet.create({
   text: {
     fontSize: 16,
-    marginBottom: '5%',
   },
 });

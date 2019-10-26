@@ -10,6 +10,13 @@ import credentials from '../auth/credentials';
 export default class Home extends React.Component {
   static navigationOptions = {
     title: 'Explore',
+    headerStyle: {
+      backgroundColor: '#111',
+    },
+    headerTintColor: '#fff',
+    headerTitleStyle: {
+      fontWeight: 'bold',
+    },
   };
   static contextType = AuthContext;
 
@@ -108,7 +115,8 @@ export default class Home extends React.Component {
         <OptionsBar
           centerIconName="locate"
           onCenterPress={this.center}
-          leftIconName="contact"
+          leftIconName="search"
+          onLeftPress={() => this.props.navigation.navigate('Search')}
           rightIconName="settings"
           onRightPress={() => this.props.navigation.navigate('Settings')}
         />

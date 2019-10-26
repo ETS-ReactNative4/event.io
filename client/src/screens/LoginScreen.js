@@ -1,82 +1,94 @@
 import React, { Component } from 'react';
-import { StyleSheet, Text, View, Image } from 'react-native';
+import {
+  LayoutAnimation,
+  ScrollView,
+  Text,
+  View,
+  Alert,
+  SafeAreaView,
+} from 'react-native';
 import AuthContext from '../context/AuthContext';
 import ImagePage from '../components/ImagePage';
-import FormGroup from '../components/FormGroup';
+import img from '../assets/login.jpeg';
+import FadeIn from '../components/animated/FadeIn';
+import LoginForm from '../components/LoginForm';
+import RegisterForm from '../components/RegisterForm';
 
 class LoginScreen extends Component {
-  static navigationOptions = {
-    title: 'Login',
-  };
   static contextType = AuthContext;
+  static navigationOptions = {
+    header: null,
+  };
 
-  onLogin = async () => {
-    const success = await this.context.login(this.email, this.pass);
+  state = {
+    login: true,
+  };
+
+  login = async (email, pass) => {
+    const success = await this.context.login(email, pass);
     success
-      ? this.props.navigation.replace('Explore')
-      : console.log('cannot log in');
+      ? this.props.navigation.navigate('App')
+      : Alert.alert('Unauthorized', 'Email or password are incorrenct');
+  };
+
+  register = async (email, password, username) => {
+    const res = await fetch('http://localhost:3000/auth/register', {
+      headers: {
+        'content-type': 'application/json',
+      },
+      method: 'post',
+      body: JSON.stringify({
+        email,
+        password,
+        username,
+      }),
+    });
+    if (res.ok) {
+      this.props.navigation.navigate('Login');
+      const data = await res.json();
+      console.log(data);
+    } else {
+      console.log('error registering');
+      const data = await res.json();
+      console.log(data);
+    }
+  };
+
+  toggleLogin = () => {
+    LayoutAnimation.easeInEaseOut();
+    this.setState({ login: !this.state.login });
   };
 
   render() {
     return (
-      <ImagePage src="https://www.pixelstalk.net/wp-content/uploads/2016/11/Betta-Fish-Wallpaper-iOS-10.jpg">
-        <View style={styles.loginContainer}>
-          <FormGroup
-            label="Email:"
-            placeholder="example@example.com"
-            autoCompleteType="email"
-            autoCapitalize="none"
-            onChangeText={email => (this.email = email)}
-          />
-          <FormGroup
-            label="Password:"
-            secureTextEntry={true}
-            onChangeText={pass => (this.pass = pass)}
-          />
-          <View>
-            <Text style={styles.loginBtn} onPress={this.onLogin} title="Login">
-              Login
-            </Text>
-            <View
-              style={{
-                flexDirection: 'row',
-                justifyContent: 'center',
-                alignItems: 'center',
-                marginTop: '10%',
-              }}>
-              <Text style={{ color: 'white' }}>New here? </Text>
-              <Text
-                onPress={() => this.props.navigation.navigate('Register')}
-                style={{ color: 'salmon' }}>
-                Register
+      <ImagePage src={img}>
+        <ScrollView
+          contentContainerStyle={{
+            zIndex: 1,
+            justifyContent: 'center',
+            flex: 1,
+          }}>
+          <FadeIn>
+            <View style={{ marginLeft: '12.5%', width: '75%' }}>
+              <Text style={{ color: 'white', fontSize: 32, marginBottom: 32 }}>
+                {this.state.login ? 'Sign in' : 'Sign up'}
               </Text>
             </View>
-          </View>
-        </View>
+            {this.state.login ? (
+              <LoginForm
+                onLogin={this.login}
+                onNavigateToRegister={this.toggleLogin}
+              />
+            ) : (
+              <RegisterForm
+                onRegister={this.register}
+                onNavigateToLogin={this.toggleLogin}
+              />
+            )}
+          </FadeIn>
+        </ScrollView>
       </ImagePage>
     );
   }
 }
-
-const styles = StyleSheet.create({
-  loginContainer: {
-    justifyContent: 'center',
-    alignItems: 'center',
-    margin: '5%',
-  },
-  loginBtn: {
-    color: 'white',
-    borderRadius: 29,
-    padding: '2%',
-    marginLeft: 'auto',
-    marginRight: 'auto',
-    marginTop: 12,
-    fontSize: 18,
-  },
-  loginTxt: {
-    color: 'white',
-    fontSize: 18,
-  },
-});
-
 export default LoginScreen;

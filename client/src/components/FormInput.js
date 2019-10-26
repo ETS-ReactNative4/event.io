@@ -16,6 +16,7 @@ const FormGroup = props => {
 const styles = StyleSheet.create({
   formGroup: {
     width: '75%',
+    marginBottom: 12,
   },
   formLabel: {
     marginBottom: 10,
@@ -25,8 +26,8 @@ const styles = StyleSheet.create({
   formInput: {
     backgroundColor: 'white',
     color: 'black',
-    borderRadius: 20,
-    padding: '2%',
+    borderRadius: 10,
+    padding: '3%',
     width: '100%',
   },
 });

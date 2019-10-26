@@ -1,5 +1,12 @@
 import React from 'react';
-import { View, Text, SectionList, StyleSheet } from 'react-native';
+import {
+  View,
+  Text,
+  SectionList,
+  StyleSheet,
+  Alert,
+  TouchableHighlight,
+} from 'react-native';
 import Icon from '../components/Icon';
 import AuthContext from '../context/AuthContext';
 
@@ -8,29 +15,35 @@ export default class SettingsScreen extends React.Component {
     title: 'Settings',
   };
   static contextType = AuthContext;
-  constructor(props) {
-    super(props);
-  }
 
-  async logout() {
-    console.log('clicked');
-    await this.context.logout();
-    this.props.navigation.replace('Login');
-  }
+  logout = () => {
+    Alert.alert('Logout', 'Are you sure you want to logout?', [
+      {
+        text: 'No',
+      },
+      {
+        text: 'Yes',
+        onPress: () => {
+          this.context.logout();
+          this.props.navigation.navigate('Auth');
+        },
+      },
+    ]);
+  };
 
   settings = [
     {
-      title: 'User',
+      title: this.context.user.username,
       data: [
         {
           icon: 'contact',
           title: 'Change username',
-          onPress: () => console.log('hello'),
+          onPress: () => console.log('change username'),
         },
         {
           icon: 'navigate',
           title: 'Hide location',
-          onPress: this.logout,
+          onPress: () => console.log('hiding location'),
         },
         {
           icon: 'exit',
@@ -61,22 +74,27 @@ export default class SettingsScreen extends React.Component {
 
 function Item({ title, icon, onPress }) {
   return (
-    <View onPress={onPress} style={styles.item}>
-      <View style={{ flexDirection: 'row', padding: 0, margin: 0 }}>
-        <Icon name={icon} style={{ fontSize: 32, marginRight: 25 }} />
-        <Text style={styles.title}>{title}</Text>
+    <TouchableHighlight onPress={onPress}>
+      <View style={styles.item}>
+        <View style={{ flexDirection: 'row', padding: 0, margin: 0 }}>
+          <Icon
+            name={icon}
+            style={{ alignSelf: 'center', fontSize: 36, marginRight: 25 }}
+          />
+          <Text style={styles.title}>{title}</Text>
+        </View>
       </View>
-    </View>
+    </TouchableHighlight>
   );
 }
 
 const styles = StyleSheet.create({
   container: {
     flex: 1,
+    justifyContent: 'center',
   },
   item: {
-    backgroundColor: '#eee',
-    paddingVertical: 20,
+    backgroundColor: '#fff',
     padding: 10,
   },
   header: {
@@ -87,5 +105,6 @@ const styles = StyleSheet.create({
   },
   title: {
     fontSize: 18,
+    alignSelf: 'center',
   },
 });

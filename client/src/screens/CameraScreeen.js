@@ -38,19 +38,17 @@ export default class CameraView extends PureComponent {
           zoom={this.state.zoom}
         />
 
-        <PageView style={styles.cameraOverlay}>
-          <View style={styles.cameraOptions}>
-            {flashIcon}
-            <TouchableOpacity onPress={this.reverseCamera}>
-              <Icon style={styles.icon} name="md-reverse-camera" />
-            </TouchableOpacity>
-          </View>
-          <TouchableOpacity
-            onPress={this.takePicture.bind(this)}
-            style={styles.capture}>
-            <Icon style={styles.icon} name="md-camera" />
+        <View style={styles.cameraOptions}>
+          {flashIcon}
+          <TouchableOpacity onPress={this.reverseCamera}>
+            <Icon style={styles.icon} name="md-reverse-camera" />
           </TouchableOpacity>
-        </PageView>
+        </View>
+        <TouchableOpacity
+          onPress={this.takePicture.bind(this)}
+          style={styles.capture}>
+          <Icon style={styles.icon} name="md-camera" />
+        </TouchableOpacity>
       </View>
     );
   }
