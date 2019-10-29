@@ -1,7 +1,7 @@
 import React, { useContext } from 'react';
 import { FriendRequestContext } from '../context/FriendRequestContext.js';
 import { View, Button, Text, FlatList, Image } from 'react-native';
-import AuthContext from '../context/AuthContext';
+import { AuthContext } from '../context/AuthContext';
 
 const RequestItem = ({ id, from, onAccept, onDecline }) => {
   const auth = useContext(AuthContext);

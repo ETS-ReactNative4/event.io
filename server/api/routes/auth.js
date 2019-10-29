@@ -3,15 +3,10 @@ const router = require('express').Router();
 const bcrypt = require('bcrypt');
 const db = require('../models');
 const jwt = require('jsonwebtoken');
-const jwtCheck = require('../middleware/jwtCheck');
 
 function unauthorized(res) {
   res.status(401).json({ message: 'Unauthorized' });
 }
-
-router.get('/protected', jwtCheck, (req, res) => {
-  res.json(req.user);
-});
 
 router.post('/refresh', async (req, res) => {
   try {
