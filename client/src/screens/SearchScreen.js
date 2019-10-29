@@ -2,7 +2,7 @@ import React from 'react';
 import { FlatList, View, Text, StyleSheet } from 'react-native';
 import BaseTextInput from '../components/BaseTextInput';
 import Icon from '../components/Icon';
-import AuthContext from '../context/AuthContext';
+import { AuthContext } from '../context/AuthContext';
 import UserListItem from '../components/UserListItem';
 export default class SearchScreen extends React.Component {
   state = {
@@ -15,36 +15,34 @@ export default class SearchScreen extends React.Component {
   };
 
   async sendFriendRequest(id) {
-    const res = await this.context.get(
-      'http://localhost:3000/friends/requests',
-      {
-        method: 'post',
-        headers: {
-          'content-type': 'application/json',
-        },
-        body: JSON.stringify({ to: id }),
+    const res = await this.context.get('/friends/requests', {
+      method: 'post',
+      headers: {
+        'content-type': 'application/json',
       },
-    );
+      body: JSON.stringify({ to: id }),
+    });
     const data = await res.json();
+    console.log('sent friend req', data);
   }
 
   getUsers = async text => {
-    const res = await this.context.get(`http://localhost:3000/users?q=${text}`);
+    const res = await this.context.get(`/users?q=${text}`);
     const data = await res.json();
     this.setState({ searchUsers: data });
   };
 
   getRequests = async () => {
-    const res = await this.context.get(
-      'http://localhost:3000/friends/requests',
-    );
+    const res = await this.context.get('/friends/requests');
     const data = await res.json();
+    console.log('friend requests', data);
     this.setState({ friendRequests: data });
   };
 
   async componentDidMount() {
     await this.getRequests();
   }
+
   render() {
     return (
       <View style={{ flex: 1 }}>

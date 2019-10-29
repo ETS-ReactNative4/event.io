@@ -1,13 +1,6 @@
 import React, { Component } from 'react';
-import {
-  LayoutAnimation,
-  ScrollView,
-  Text,
-  View,
-  Alert,
-  SafeAreaView,
-} from 'react-native';
-import AuthContext from '../context/AuthContext';
+import { LayoutAnimation, ScrollView, Text, View, Alert } from 'react-native';
+import { AuthContext } from '../context/AuthContext';
 import ImagePage from '../components/ImagePage';
 import img from '../assets/login.jpeg';
 import FadeIn from '../components/animated/FadeIn';

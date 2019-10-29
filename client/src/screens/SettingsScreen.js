@@ -8,7 +8,7 @@ import {
   TouchableHighlight,
 } from 'react-native';
 import Icon from '../components/Icon';
-import AuthContext from '../context/AuthContext';
+import { AuthContext } from '../context/AuthContext';
 
 export default class SettingsScreen extends React.Component {
   static navigationOptions = {
@@ -33,11 +33,25 @@ export default class SettingsScreen extends React.Component {
 
   settings = [
     {
-      title: this.context.user.username,
+      title: 'General',
+      data: [
+        {
+          icon: 'color-palette',
+          title: 'Change theme',
+        },
+      ],
+    },
+    {
+      title: 'User',
       data: [
         {
           icon: 'contact',
           title: 'Change username',
+          onPress: () => console.log('change username'),
+        },
+        {
+          icon: 'lock',
+          title: 'Change password',
           onPress: () => console.log('change username'),
         },
         {
@@ -84,7 +98,12 @@ function Item({ title, icon, onPress }) {
         <View style={{ flexDirection: 'row', padding: 0, margin: 0 }}>
           <Icon
             name={icon}
-            style={{ alignSelf: 'center', fontSize: 36, marginRight: 25 }}
+            style={{
+              color: '#333',
+              alignSelf: 'center',
+              fontSize: 36,
+              marginRight: 25,
+            }}
           />
           <Text style={styles.title}>{title}</Text>
         </View>

@@ -72,7 +72,7 @@ export default class NoteView extends React.Component {
             onContentSizeChange={this.onBodySizeChange}
             onEndEditing={this.props.onBodyEndEditing}
           />
-          <View style={{ flexDirection: 'row', alignItems: 'center' }}>
+          <View>
             <Text style={styles.expiryLabel}>
               Expires in {this.state.expiryDate}
             </Text>
@@ -84,10 +84,6 @@ export default class NoteView extends React.Component {
             />
           </View>
         </PageView>
-        <OptionsBar
-          rightIconName="camera"
-          onRightPress={() => this.props.navigation.navigate('Camera')}
-        />
       </View>
     );
   }
@@ -100,6 +96,7 @@ const styles = StyleSheet.create({
   },
   expiryLabel: {
     fontStyle: 'italic',
+    marginBottom: 24,
   },
   titleContainer: {
     borderBottomWidth: 1,

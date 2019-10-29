@@ -3,22 +3,15 @@ import { View, Text, StyleSheet } from 'react-native';
 import MapView, { Marker, Callout } from 'react-native-maps';
 import Icon from '../components/Icon';
 import Geolocation from '@react-native-community/geolocation';
-import OptionsBar from '../components/OptionsBar';
-import AuthContext from '../context/AuthContext';
+import { AuthContext } from '../context/AuthContext';
 
 export default class Home extends React.Component {
   static navigationOptions = {
     title: 'Explore',
-    headerStyle: {
-      backgroundColor: '#111',
-    },
-    headerTintColor: '#fff',
-    headerTitleStyle: {
-      fontWeight: 'bold',
-    },
   };
 
   static contextType = AuthContext;
+
   state = {
     posts: [],
     position: {
@@ -42,25 +35,6 @@ export default class Home extends React.Component {
         enableHighAccuracy: true,
       },
     );
-    // fill in posts
-    fetch('https://jsonplaceholder.typicode.com/posts').then(res => {
-      res.json().then(data => {
-        for (let d of data) {
-          d.pos = {
-            longitude:
-              this.state.position.longitude + 0.02 * (Math.random() - 0.5),
-            latitude:
-              this.state.position.latitude + 0.02 * (Math.random() - 0.5),
-          };
-        }
-        this.setState({ posts: data });
-      });
-    });
-  };
-
-  logout = async () => {
-    this.context.logout();
-    this.props.navigation.replace('Login');
   };
 
   center = () => {
@@ -107,15 +81,12 @@ export default class Home extends React.Component {
             onPress={() => this.props.navigation.navigate('Note')}
             name="add-circle"
           />
+          <Icon
+            style={[styles.icon, { bottom: 0 }]}
+            onPress={this.center}
+            name="locate"
+          />
         </MapView>
-        <OptionsBar
-          centerIconName="locate"
-          onCenterPress={this.center}
-          leftIconName="search"
-          onLeftPress={() => this.props.navigation.navigate('Search')}
-          rightIconName="settings"
-          onRightPress={() => this.props.navigation.navigate('Settings')}
-        />
       </View>
     );
   }
@@ -129,12 +100,11 @@ const styles = StyleSheet.create({
     justifyContent: 'center',
   },
   icon: {
-    position: 'absolute',
-    bottom: '5%',
-    right: '5%',
-    fontSize: 64,
     zIndex: 2,
-    // color: '#428bca',
-    color: 'black',
+    position: 'absolute',
+    left: 12,
+    fontSize: 48,
+    bottom: 64,
+    color: '#0275d8',
   },
 });

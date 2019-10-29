@@ -1,6 +1,6 @@
 import React, { Component } from 'react';
 import { StyleSheet, Alert, View, Text, TouchableOpacity } from 'react-native';
-import AuthContext from '../context/AuthContext';
+import { AuthContext } from '../context/AuthContext';
 import FormContainer from './FormContainer';
 import FormInput from './FormInput';
 import FormSubmit from './FormSubmit';

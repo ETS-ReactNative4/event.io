@@ -236,11 +236,11 @@ LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
 OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE.
 
-## RNFS
+## RNGestureHandler
 
 The MIT License (MIT)
 
-Copyright (c) 2015 Johannes Lumpe
+Copyright (c) 2016 Krzysztof Magiera
 
 Permission is hereby granted, free of charge, to any person obtaining a copy
 of this software and associated documentation files (the "Software"), to deal
@@ -261,7 +261,7 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE.
 
 
-## RNGestureHandler
+## RNReanimated
 
 The MIT License (MIT)
 

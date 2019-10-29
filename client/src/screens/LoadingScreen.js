@@ -1,19 +1,20 @@
-import React from 'react';
-import AuthContext from '../context/AuthContext';
-
-export default class LoadingScreen extends React.Component {
-  static contextType = AuthContext;
-  async componentDidMount() {
-    const token = await this.context.getToken();
-    if (token) {
-      const success = await this.context.refresh(token);
-      console.log(success);
-      success
-        ? this.props.navigation.navigate('App')
+import React, { useContext, useEffect } from 'react';
+import { AuthContext } from '../context/AuthContext';
+import { SafeAreaView, Text } from 'react-native';
+export default function LoadingScreen({ navigation }) {
+  const auth = useContext(AuthContext);
+  useEffect(() => {
+    auth.getTokenFromStorage().then(token => {
+      token
+        ? auth.refreshToken(token).then(success => {
+            success ? navigation.navigate('App') : navigation.navigate('Auth');
+          })
         : this.props.navigation.navigate('Auth');
-    } else {
-      this.props.navigation.navigate('Auth');
-    }
-  }
-  render = () => null;
+    });
+  }, []);
+  return (
+    <SafeAreaView>
+      <Text>Loading...</Text>
+    </SafeAreaView>
+  );
 }
