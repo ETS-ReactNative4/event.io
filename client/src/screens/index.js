@@ -15,6 +15,7 @@ import SearchScreen from './SearchScreen';
 import FeedScreen from './FeedScreen';
 import ProfileScreen from './ProfileScreen';
 import FriendRequestsScreen from './FriendRequestsScreen';
+import FriendsScreen from './FriendsScreen';
 import ProfileIcon from '../components/ProfileIcon';
 
 const AuthNavigator = createStackNavigator({
@@ -44,6 +45,7 @@ const FeedStack = createStackNavigator({
 const ProfileStack = createStackNavigator({
   Profile: ProfileScreen,
   FriendRequests: FriendRequestsScreen,
+  Friends: FriendsScreen,
 });
 
 const SettingsStack = createStackNavigator({

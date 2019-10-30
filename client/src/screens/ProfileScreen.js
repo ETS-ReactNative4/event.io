@@ -7,7 +7,7 @@ import Badge from '../components/Badge';
 import { FriendRequestContext } from '../context/FriendRequestContext';
 import FadeIn from '../components/animated/FadeIn';
 
-const ListItem = ({ text, onPress }) => {
+const ListItem = ({ text, badge, onPress }) => {
   const ctx = useContext(FriendRequestContext);
   return (
     <TouchableOpacity style={{ backgroundColor: 'white' }} onPress={onPress}>
@@ -19,7 +19,9 @@ const ListItem = ({ text, onPress }) => {
           alignItems: 'center',
         }}>
         <Text style={{ fontSize: 18, marginRight: 12 }}>{text}</Text>
-        <Badge text={ctx.friendRequests.length} />
+        {ctx.friendRequests.length > 0 && (
+          <Badge text={ctx.friendRequests.length} />
+        )}
         <Icon
           style={{ marginLeft: 'auto', fontSize: 18 }}
           name="arrow-dropright"></Icon>
@@ -28,36 +30,37 @@ const ListItem = ({ text, onPress }) => {
   );
 };
 
-export default class ProfileScreen extends React.Component {
-  static contextType = AuthContext;
-  static navigationOptions = {
-    title: 'Profile',
-  };
-
-  render() {
-    return (
-      <PageView style={{ flex: 1 }}>
-        <FadeIn duration={500}>
-          <View style={styles.bioContainer}>
-            <Image
-              style={{ width: 100, height: 100, borderRadius: 100 }}
-              source={{
-                uri: `https://fakeimg.pl/100x100/333/?text=${this.context.user.username[0].toUpperCase()}&font=noto`,
-              }}
-            />
-            <View style={{ marginLeft: 32 }}>
-              <Text style={styles.username}>{this.context.user.username}</Text>
-              <Text style={styles.email}>{this.context.user.email}</Text>
-            </View>
+export default function ProfileScreen(props) {
+  const auth = useContext(AuthContext);
+  const fr = useContext(FriendRequestContext);
+  return (
+    <PageView style={{ flex: 1 }}>
+      <FadeIn duration={500}>
+        <View style={styles.bioContainer}>
+          <Image
+            style={{ width: 100, height: 100, borderRadius: 100 }}
+            source={{
+              uri: `https://fakeimg.pl/100x100/333/?text=${auth.user.username[0].toUpperCase()}&font=noto`,
+            }}
+          />
+          <View style={{ marginLeft: 32 }}>
+            <Text style={styles.username}>{auth.user.username}</Text>
+            <Text style={styles.email}>{auth.user.email}</Text>
           </View>
-          <Text>{this.context.user.bio}</Text>
+        </View>
+        <Text>{auth.user.bio}</Text>
+        {fr.friendRequests.length > 0 && (
           <ListItem
-            onPress={() => this.props.navigation.navigate('FriendRequests')}
+            onPress={() => props.navigation.navigate('FriendRequests')}
             text="Friend Requests"></ListItem>
-        </FadeIn>
-      </PageView>
-    );
-  }
+        )}
+        <ListItem
+          text={`Friends (${fr.friends.length})`}
+          onPress={() => props.navigation.navigate('Friends')}
+        />
+      </FadeIn>
+    </PageView>
+  );
 }
 
 const styles = StyleSheet.create({

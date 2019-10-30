@@ -3,18 +3,18 @@ import { FriendRequestContext } from '../context/FriendRequestContext.js';
 import { View, Button, Text, FlatList, Image } from 'react-native';
 import { AuthContext } from '../context/AuthContext';
 
-const RequestItem = ({ id, from, onAccept, onDecline }) => {
+const RequestItem = ({ id, from }) => {
   const auth = useContext(AuthContext);
-  async function respond(id, accept) {
+  async function respond(id, accepted) {
+    console.log('clicked');
     const res = await auth.get(`/friends/requests/${id}`, {
       method: 'put',
       headers: {
-        'content-type': 'application/json',
+        'Content-Type': 'application/json',
       },
-      body: JSON.stringify({ accept }),
+      body: JSON.stringify({ accepted: accepted }),
     });
-    const data = await res.json();
-    console.log(data);
+    console.log(res);
   }
   return (
     <View style={{ flexDirection: 'row', alignItems: 'center', padding: 12 }}>
@@ -45,13 +45,19 @@ export default class FriendRequestsScreen extends React.Component {
   render() {
     return (
       <View style={{ flex: 1 }}>
-        <FlatList
-          data={this.context.friendRequests}
-          keyExtractor={item => item._id}
-          renderItem={({ item }) => {
-            return <RequestItem id={item._id} from={item.from} />;
-          }}
-        />
+        {this.context.friendRequests.length > 1 ? (
+          <FlatList
+            data={this.context.friendRequests}
+            keyExtractor={item => item._id}
+            renderItem={({ item }) => {
+              return <RequestItem id={item._id} from={item.from} />;
+            }}
+          />
+        ) : (
+          <Text style={{ fontSize: 18, padding: 12 }}>
+            You have no friend requests!
+          </Text>
+        )}
       </View>
     );
   }
