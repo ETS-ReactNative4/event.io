@@ -43,19 +43,23 @@ router.post('/login', async (req, res) => {
 router.post('/register', async (req, res) => {
   const { email, password, username } = req.body;
   const userExists = await db.User.findOne({ email });
-  if (userExists) {
-    console.log('user already exists');
-    return res.json({ message: 'Email has already been registered' });
-  }
+  if (userExists) return res.status(304).end();
   bcrypt.hash(password, 10, async (err, hash) => {
     if (err) {
-      return res.status(400).json(err);
+      return res.status(500).end();
     } else {
       try {
-        const user = await db.User.create({ username, email, password: hash });
-        res.json({ message: 'User created' });
+        const user = await db.User.create({
+          username,
+          email,
+          password: hash,
+          picture: `https://fakeimg.pl/100x100/333/?text=${username[0].toUpperCase()}&font=noto`,
+          friends: []
+        });
+        res.json({ username: user.username, email: user.email, picture: user.picture });
       } catch (err) {
-        res.status(400).json(err);
+        console.log(err);
+        res.status(400).end();
       }
     }
   });

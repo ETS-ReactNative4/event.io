@@ -1,14 +1,14 @@
 import React from 'react';
 import HiddenNotesApp from './src/HiddenNotesApp';
 import { AuthProvider } from './src/context/AuthContext';
-import { FriendRequestProvider } from './src/context/FriendRequestContext';
+import { FriendsProvider } from './src/context/FriendsContext';
 class App extends React.Component {
   render() {
     return (
       <AuthProvider>
-        <FriendRequestProvider>
+        <FriendsProvider>
           <HiddenNotesApp />
-        </FriendRequestProvider>
+        </FriendsProvider>
       </AuthProvider>
     );
   }

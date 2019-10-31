@@ -36,14 +36,7 @@ class LoginScreen extends Component {
         username,
       }),
     });
-    if (res.ok) {
-      const data = await res.json();
-      this.toggleLogin();
-    } else {
-      console.log('error registering');
-      const data = await res.json();
-      console.log(data);
-    }
+    res.ok ? this.toggleLogin() : Alert.alert('Error Registering');
   };
 
   toggleLogin = () => {

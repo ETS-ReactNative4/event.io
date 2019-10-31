@@ -5,9 +5,9 @@ export default function PageView(props) {
 }
 const style = StyleSheet.create({
   main: {
-    paddingTop: '5%',
-    paddingLeft: '5%',
-    paddingRight: '5%',
-    paddingBottom: '5%',
+    paddingTop: '2%',
+    paddingLeft: '2%',
+    paddingRight: '2%',
+    paddingBottom: '2%',
   },
 });

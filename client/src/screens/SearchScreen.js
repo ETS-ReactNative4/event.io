@@ -1,74 +1,75 @@
-import React from 'react';
-import { FlatList, View, Text, StyleSheet } from 'react-native';
+import React, { useState, useContext } from 'react';
+import { FlatList, View, StyleSheet } from 'react-native';
 import BaseTextInput from '../components/BaseTextInput';
 import Icon from '../components/Icon';
 import { AuthContext } from '../context/AuthContext';
-import UserListItem from '../components/UserListItem';
-export default class SearchScreen extends React.Component {
-  state = {
-    searchUsers: [],
-    friendRequests: [],
-  };
-  static contextType = AuthContext;
-  static navigationOptions = {
-    title: 'Search',
-  };
+import { FriendsContext } from '../context/FriendsContext';
+import BaseUserListItem from '../components/BaseUserListItem';
 
-  async sendFriendRequest(id) {
-    const res = await this.context.get('/friends/requests', {
+export default function SearchScreen() {
+  const [searchUsers, setSearchUsers] = useState([]);
+  const authContext = useContext(AuthContext);
+  const friendsContext = useContext(FriendsContext);
+
+  sendFriendRequest = async id => {
+    console.log('pressed');
+    const res = await authContext.get('/friends/requests', {
       method: 'post',
       headers: {
         'content-type': 'application/json',
       },
       body: JSON.stringify({ to: id }),
     });
-    const data = await res.json();
-    console.log('sent friend req', data);
-  }
+    if (res.ok) {
+      console.log(res.json());
+    }
+  };
 
   getUsers = async text => {
-    const res = await this.context.get(`/users?q=${text}`);
+    const res = await authContext.get(`/users?q=${text}`);
     const data = await res.json();
-    this.setState({ searchUsers: data });
+    setSearchUsers(data);
   };
 
-  getRequests = async () => {
-    const res = await this.context.get('/friends/requests');
-    const data = await res.json();
-    console.log('friend requests', data);
-    this.setState({ friendRequests: data });
+  isFriend = id => {
+    for (let f of friendsContext.friends) {
+      if (f._id === id) return true;
+    }
+    return false;
   };
 
-  async componentDidMount() {
-    await this.getRequests();
-  }
-
-  render() {
-    return (
-      <View style={{ flex: 1 }}>
-        <View style={styles.searchbar}>
-          <Icon style={styles.icon} name="search" />
-          <BaseTextInput
-            autoCapitalize="none"
-            autoCorrect={false}
-            onChangeText={text => this.getUsers(text)}
-            placeholder="Search for users..."
-            style={styles.searchInput}
-          />
-        </View>
-        <FlatList
-          data={this.state.searchUsers}
-          renderItem={({ item }) => (
-            <UserListItem
-              onAdd={() => this.sendFriendRequest(item._id)}
-              username={item.username}
-            />
-          )}
-          keyExtractor={item => item._id}
+  return (
+    <View style={{ flex: 1 }}>
+      <View style={styles.searchbar}>
+        <Icon style={styles.icon} name="search" />
+        <BaseTextInput
+          autoCapitalize="none"
+          autoCorrect={false}
+          onChangeText={text => getUsers(text)}
+          placeholder="Search for users..."
+          style={styles.searchInput}
         />
       </View>
-    );
-  }
+
+      <FlatList
+        data={searchUsers}
+        renderItem={({ item }) => (
+          <BaseUserListItem user={item}>
+            <View style={{ marginLeft: 'auto' }}>
+              {!isFriend(item._id) && (
+                <Icon
+                  style={{ fontSize: 32 }}
+                  onPress={() => sendFriendRequest(item._id)}
+                  name="person-add"
+                />
+              )}
+            </View>
+          </BaseUserListItem>
+        )}
+        keyExtractor={item => item._id}
+      />
+    </View>
+  );
 }
 
 const styles = StyleSheet.create({

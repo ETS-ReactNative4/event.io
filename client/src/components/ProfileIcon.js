@@ -1,15 +1,15 @@
 import React, { useState } from 'react';
-import { FriendRequestContext } from '../context/FriendRequestContext';
+import { FriendsContext } from '../context/FriendsContext';
 import Icon from '../components/Icon';
 import Badge from '../components/Badge';
 import { View } from 'react-native';
 
 export default class ProfileIcon extends React.Component {
-  static contextType = FriendRequestContext;
+  static contextType = FriendsContext;
 
   getSpacing() {
-    const { friendRequests } = this.context;
-    const count = friendRequests.length;
+    const { requests } = this.context;
+    const count = requests.length;
     if (count > 99) {
       return -24;
     } else if (count > 9) {
@@ -20,8 +20,8 @@ export default class ProfileIcon extends React.Component {
   }
 
   render() {
-    const { friendRequests } = this.context;
-    const count = friendRequests.length;
+    const { requests } = this.context;
+    const count = requests.length;
     return (
       <View style={{ justifyContent: 'center', alignItems: 'center' }}>
         {count > 0 && (

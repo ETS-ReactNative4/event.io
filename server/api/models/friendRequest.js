@@ -1,4 +1,4 @@
-const mongoose = require('mongoose')
+const mongoose = require('mongoose');
 
 const FriendRequestSchema = new mongoose.Schema({
   from: {
@@ -13,9 +13,24 @@ const FriendRequestSchema = new mongoose.Schema({
   },
   accepted: {
     type: Boolean,
-    default: false
+    default: null,
+    required: true
+  },
+  closed: {
+    type: Boolean,
+    default: false,
+    required: true
+  },
+  resolvedAt: {
+    type: Date,
+    default: null
+  },
+  issuedAt: {
+    type: Date,
+    default: Date.now,
+    required: true
   }
-})
+});
 
-const FriendRequest = mongoose.model('FriendRequest', FriendRequestSchema)
-module.exports = FriendRequest
+const FriendRequest = mongoose.model('FriendRequest', FriendRequestSchema);
+module.exports = FriendRequest;

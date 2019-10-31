@@ -101,8 +101,8 @@ function Item({ title, icon, onPress }) {
             style={{
               color: '#333',
               alignSelf: 'center',
-              fontSize: 36,
-              marginRight: 25,
+              fontSize: 32,
+              marginRight: 16,
             }}
           />
           <Text style={styles.title}>{title}</Text>
@@ -119,16 +119,17 @@ const styles = StyleSheet.create({
   },
   item: {
     backgroundColor: '#fff',
-    padding: 10,
+    padding: 12,
   },
   header: {
-    padding: 10,
-    fontSize: 24,
     backgroundColor: 'white',
+    padding: 10,
+    fontSize: 22,
+    fontWeight: 'bold',
     paddingVertical: 10,
   },
   title: {
-    fontSize: 18,
+    fontSize: 16,
     alignSelf: 'center',
   },
 });

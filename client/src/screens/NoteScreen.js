@@ -1,19 +1,48 @@
 import React from 'react';
-import { StyleSheet, Text, View, Switch } from 'react-native';
+import { TouchableOpacity, StyleSheet, Text, View, Switch } from 'react-native';
 import Slider from 'react-native-slider';
 import BaseMultiLineTextInput from '../components/BaseMultilineTextInput';
 import BaseTextInput from '../components/BaseTextInput';
 import PageView from '../components/PageView';
-import OptionsBar from '../components/OptionsBar';
+import { AuthContext } from '../context/AuthContext';
 
 export default class NoteView extends React.Component {
+  static contextType = AuthContext;
   static navigationOptions = {
     title: 'Post',
   };
   state = {
-    title: 'Untitled',
+    title: '',
     body: '',
     expiryDate: '30m',
+  };
+
+  submitPost = async () => {
+    if (!this.state.title || !this.state.body)
+      return console.log('must provide title and body');
+
+    const res = await this.context.get('/posts', {
+      method: 'post',
+      headers: {
+        'content-type': 'application/json',
+      },
+      body: JSON.stringify({
+        title: this.state.title,
+        body: this.state.body,
+        public: true,
+      }),
+    });
+    if (res.ok) {
+      try {
+        this.props.navigation.navigate('Explore');
+      } catch (err) {
+        console.log(err);
+      }
+    } else [console.log('Error: Server resoonded with status', res.status)];
+  };
+
+  canSubmit = () => {
+    return this.state.title && this.state.body;
   };
 
   onExpiryDateChange = e => {
@@ -40,10 +69,7 @@ export default class NoteView extends React.Component {
       }
     }
   };
-  onBodySizeChange = e => {
-    const height = e.nativeEvent.contentSize.height;
-    console.log('height', height);
-  };
+
   render() {
     return (
       <View style={styles.background}>
@@ -51,26 +77,13 @@ export default class NoteView extends React.Component {
           <BaseTextInput
             placeholder="Title"
             style={styles.titleContainer}
-            onChangeText={this.props.onTitleChange}
+            onChangeText={text => this.setState({ title: text })}
           />
-          <View
-            style={{
-              flexDirection: 'row',
-              alignItems: 'center',
-              marginLeft: 'auto',
-            }}>
-            <Text style={[styles.expiryLabel, { marginRight: 12 }]}>
-              Public
-            </Text>
-            <Switch value={true} />
-          </View>
           <BaseMultiLineTextInput
             returnKeyType="done"
             style={styles.bodyContainer}
             placeholder="Enter text here."
-            onChangeText={this.props.onBodyChange}
-            onContentSizeChange={this.onBodySizeChange}
-            onEndEditing={this.props.onBodyEndEditing}
+            onChangeText={text => this.setState({ body: text })}
           />
           <View>
             <Text style={styles.expiryLabel}>
@@ -83,6 +96,12 @@ export default class NoteView extends React.Component {
               maximumValue={4}
             />
           </View>
+          <TouchableOpacity
+            disabled={!this.canSubmit()}
+            onPress={this.submitPost}
+            style={styles.button}>
+            <Text style={styles.buttonLabel}>Share</Text>
+          </TouchableOpacity>
         </PageView>
       </View>
     );
@@ -90,6 +109,17 @@ export default class NoteView extends React.Component {
 }
 
 const styles = StyleSheet.create({
+  button: {
+    padding: 12,
+    marginTop: 16,
+    marginLeft: 'auto',
+    borderRadius: 6,
+    backgroundColor: '#0275d8',
+  },
+  buttonLabel: {
+    fontSize: 16,
+    color: 'white',
+  },
   background: {
     backgroundColor: 'white',
     flex: 1,
