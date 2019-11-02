@@ -19,7 +19,6 @@ export default ProfileScreen = ({ navigation }) => {
       const res = await authCtx.get('/posts');
       const data = await res.json();
       setPosts(data);
-      console.log(data);
     } catch (err) {
       console.log(err);
     }
@@ -41,14 +40,14 @@ export default ProfileScreen = ({ navigation }) => {
     <ScrollView>
       <PageView style={{ flex: 1 }}>
         <FadeIn duration={500}>
-          <View style={styles.bioContainer}>
+          <View style={styles.header}>
             <Avatar size={128} user={authCtx.user} />
             <View style={{ marginLeft: 32 }}>
               <Text style={styles.username}>{authCtx.user.username}</Text>
               <Text
-                style={{ fontWieght: 'bold' }}
+                style={{ fontWeight: 'bold', fontStyle: 'italic' }}
                 onPress={() => navigation.navigate('Friends')}>
-                Following {friendsCtx.friends.length}
+                Friends {friendsCtx.friends.length}
               </Text>
             </View>
           </View>
@@ -60,12 +59,10 @@ export default ProfileScreen = ({ navigation }) => {
               <Badge text={friendsCtx.requests.length} />
             </ScreenListItem>
           )}
-          <Text style={{ fontSize: 18, fontWeight: 'bold', marginVertical: 6 }}>
-            Posts
-          </Text>
-          {posts.map(el => {
+          {posts.reverse().map(el => {
             return (
-              <ScreenListItem
+              <PostListItem
+                post={el}
                 text={el.title}
                 onPress={() => {
                   navigation.navigate('NoteDetails', { post: el });
@@ -84,11 +81,10 @@ ProfileScreen.navigationOptions = {
 };
 
 const styles = StyleSheet.create({
-  bioContainer: {
+  header: {
     flexDirection: 'row',
     alignItems: 'center',
     paddingVertical: 12,
-    marginBottom: 12,
   },
   container: {},
   username: { fontSize: 22, marginBottom: 12 },
