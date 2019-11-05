@@ -109,9 +109,10 @@ export class AuthProvider extends Component {
       }
     },
     logout: async () => {
+      this.state.socket.removeAllListeners();
       this.state.socket.disconnect();
       await AsyncStorage.removeItem('token');
-      this.setState({ token: null, user: null });
+      this.setState({ token: null, user: null, socket: null });
     },
   };
 

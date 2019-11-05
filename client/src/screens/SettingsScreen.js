@@ -23,8 +23,8 @@ export default class SettingsScreen extends React.Component {
       },
       {
         text: 'Yes',
-        onPress: () => {
-          this.context.logout();
+        onPress: async () => {
+          await this.context.logout();
           this.props.navigation.navigate('Auth');
         },
       },

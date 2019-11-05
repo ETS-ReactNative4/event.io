@@ -1,90 +1,102 @@
 import React, { useContext, useEffect, useState } from 'react';
-import { ScrollView, View, StyleSheet, Text } from 'react-native';
-import PageView from '../components/PageView';
+import {
+  Button,
+  View,
+  StyleSheet,
+  Text,
+  KeyboardAvoidingView,
+} from 'react-native';
+import { ScrollView, FlatList } from 'react-navigation';
 import Badge from '../components/Badge';
 import { FriendsContext } from '../context/FriendsContext';
 import { AuthContext } from '../context/AuthContext';
-import FadeIn from '../components/animated/FadeIn';
 import Avatar from '../components/Avatar';
 import ScreenListItem from '../components/ScreenListItem';
 import PostListItem from '../components/PostListItem';
+import { useHttp } from '../hooks/http';
+import Icon from '../components/Icon';
 
-export default ProfileScreen = ({ navigation }) => {
+const ProfileScreen = ({ navigation }) => {
   const authCtx = useContext(AuthContext);
   const friendsCtx = useContext(FriendsContext);
-  const [posts, setPosts] = useState([]);
+  const [data, setData] = useState(null);
+  const profileId = navigation.getParam(
+    'id',
+    authCtx.user ? authCtx.user.uid : null,
+  );
 
-  async function getPosts() {
-    try {
-      const res = await authCtx.get('/posts');
-      const data = await res.json();
-      setPosts(data);
-    } catch (err) {
-      console.log(err);
-    }
-  }
+  const [res, err] = useHttp(`/profile/${profileId}`);
+  res && res.then(data => setData(data));
+  err && console.log(err);
 
-  useEffect(getPosts, []);
-  // handle socket subscriptions
-  useEffect(() => {
-    if (authCtx.socket) {
-      authCtx.socket.on('post', getPosts);
-    }
-    return () => {
-      if (authCtx.socket) {
-        authCtx.socket.removeListener('post', getPosts);
-      }
-    };
-  }, [authCtx]);
   return (
-    <ScrollView>
-      <PageView style={{ flex: 1 }}>
-        <FadeIn duration={500}>
-          <View style={styles.header}>
-            <Avatar size={128} user={authCtx.user} />
-            <View style={{ marginLeft: 32 }}>
-              <Text style={styles.username}>{authCtx.user.username}</Text>
-              <Text
-                style={{ fontWeight: 'bold', fontStyle: 'italic' }}
-                onPress={() => navigation.navigate('Friends')}>
-                Friends {friendsCtx.friends.length}
-              </Text>
+    <KeyboardAvoidingView behavior="padding" style={{ flex: 1 }}>
+      <ScrollView>
+        {data ? (
+          <View>
+            <View style={styles.header}>
+              <Avatar size={128} user={data.user} />
+              <View style={{ marginLeft: 32 }}>
+                <Text style={styles.username}>{data.user.username}</Text>
+                {data.relationship !== 'other' ? (
+                  <Text
+                    style={{ fontWeight: 'bold' }}
+                    onPress={() => navigation.push('Friends')}>
+                    Friends {data.user.friends.length}
+                  </Text>
+                ) : (
+                  <Button title="Add Friend" />
+                )}
+              </View>
             </View>
-          </View>
-          <Text>{authCtx.user.bio}</Text>
-          {friendsCtx.requests.length > 0 && (
-            <ScreenListItem
-              onPress={() => navigation.navigate('FriendRequests')}
-              text="Requests">
-              <Badge text={friendsCtx.requests.length} />
-            </ScreenListItem>
-          )}
-          {posts.reverse().map(el => {
-            return (
-              <PostListItem
-                post={el}
-                text={el.title}
-                onPress={() => {
-                  navigation.navigate('NoteDetails', { post: el });
-                }}
+
+            {data.relationship === 'self' && friendsCtx.requests.length > 0 && (
+              <ScreenListItem
+                onPress={() => navigation.navigate('FriendRequests')}
+                text="Requests">
+                <Badge text={friendsCtx.requests.length} />
+              </ScreenListItem>
+            )}
+
+            {data.relationship !== 'other' ? (
+              <FlatList
+                data={data.posts.reverse()}
+                renderItem={({ item }) => <PostListItem post={item} />}
               />
-            );
-          })}
-        </FadeIn>
-      </PageView>
-    </ScrollView>
+            ) : (
+              <View
+                style={{
+                  flexDirection: 'row',
+                  alignItems: 'center',
+                  marginLeft: 12,
+                }}>
+                <Icon style={{ fontSize: 22, marginRight: 12 }} name="lock" />
+                <Text>Locked</Text>
+              </View>
+            )}
+          </View>
+        ) : (
+          <Text>Loading</Text>
+        )}
+      </ScrollView>
+    </KeyboardAvoidingView>
   );
 };
-
-ProfileScreen.navigationOptions = {
-  title: 'Profile',
+ProfileScreen.navigationOptions = function({ navigation }) {
+  return {
+    title: navigation.getParam('title', 'Profile'),
+  };
 };
+export default ProfileScreen;
 
 const styles = StyleSheet.create({
   header: {
     flexDirection: 'row',
     alignItems: 'center',
-    paddingVertical: 12,
+    paddingHorizontal: 12,
+    paddingVertical: 24,
+    borderBottomWidth: 1,
+    borderBottomColor: 'lightgray',
   },
   container: {},
   username: { fontSize: 22, marginBottom: 12 },

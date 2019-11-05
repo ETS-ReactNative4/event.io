@@ -25,6 +25,8 @@ app.use('/posts', require('./api/routes/posts'));
 app.use('/friends', require('./api/routes/friends'));
 app.use('/users', require('./api/routes/users'));
 app.use('/user', require('./api/routes/user'));
+app.use('/profile', require('./api/routes/profile'));
+app.use('/feed', require('./api/routes/feed'));
 
 // connect db
 mongoose.connect(MONGO_URI, {
@@ -34,7 +36,9 @@ mongoose.connect(MONGO_URI, {
 });
 const mongoConnection = mongoose.connection;
 mongoConnection.on('error', console.error.bind(console, 'MongoDB connection error:'));
-
+mongoose.set('debug', function(coll, method, query, doc) {
+  console.log(coll + ' ' + method + ' ' + JSON.stringify(query) + ' ' + JSON.stringify(doc));
+});
 // Websockets
 let socketCount = 0;
 io.sockets.on('connection', socket => {

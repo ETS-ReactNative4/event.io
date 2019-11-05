@@ -18,10 +18,10 @@ export default class NoteView extends React.Component {
   };
 
   submitPost = async () => {
-    if (!this.state.title || !this.state.body)
-      return console.log('must provide title and body');
-
-    const res = await this.context.get('/posts', {
+    if (!this.state.body) return console.log('must provide title and body');
+    const post = this.props.navigation.getParam('post', null);
+    const url = post ? `/posts/${post._id}` : '/posts';
+    const res = await this.context.get(url, {
       method: 'post',
       headers: {
         'content-type': 'application/json',
@@ -42,7 +42,7 @@ export default class NoteView extends React.Component {
   };
 
   canSubmit = () => {
-    return this.state.title && this.state.body;
+    return this.state.body;
   };
 
   onExpiryDateChange = e => {
@@ -74,11 +74,6 @@ export default class NoteView extends React.Component {
     return (
       <View style={styles.background}>
         <PageView style={styles.background}>
-          <BaseTextInput
-            placeholder="Title"
-            style={styles.titleContainer}
-            onChangeText={text => this.setState({ title: text })}
-          />
           <BaseMultiLineTextInput
             returnKeyType="done"
             style={styles.bodyContainer}

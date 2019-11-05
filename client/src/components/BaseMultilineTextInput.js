@@ -5,11 +5,11 @@ export default function BaseMultilineTextInput(props) {
   return (
     <TextInput
       keyboardAppearance="dark"
-      {...props}
       selectionColor="indigo"
       multiline={true}
       blurOnSubmit={true}
       style={[styles.text, props.style]}
+      {...props}
       maxLength={maxLength}>
       {props.text}
     </TextInput>

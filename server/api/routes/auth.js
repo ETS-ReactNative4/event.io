@@ -4,6 +4,8 @@ const bcrypt = require('bcrypt');
 const db = require('../models');
 const jwt = require('jsonwebtoken');
 
+const tokenDuration = '1d';
+
 function unauthorized(res) {
   res.status(401).json({ message: 'Unauthorized' });
 }
@@ -13,7 +15,7 @@ router.post('/refresh', async (req, res) => {
     const decoded = jwt.verify(req.body.token, process.env.API_KEY);
     const { email, uid, username } = decoded;
     const token = jwt.sign({ email, uid, username }, process.env.API_KEY, {
-      expiresIn: '1h'
+      expiresIn: tokenDuration
     });
     res.json({ token, user: { email, uid, username } });
   } catch (err) {
@@ -26,17 +28,19 @@ router.post('/login', async (req, res) => {
   const { email, password } = req.body;
   const user = await db.User.findOne({ email });
   if (!user) return unauthorized(res);
+
   bcrypt.compare(password, user.password, (err, same) => {
     if (err || !same) return unauthorized(res);
     const payload = {
+      uid: user._id,
       username: user.username,
-      email: user.email,
-      uid: user._id
+      picture: user.picture,
+      friends: user.friends
     };
     const token = jwt.sign(payload, process.env.API_KEY, {
-      expiresIn: '1h'
+      expiresIn: tokenDuration
     });
-    res.json({ token, user });
+    res.json({ token, user: payload });
   });
 });
 

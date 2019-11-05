@@ -12,7 +12,6 @@ export const FriendsProvider = ({ children }) => {
       const res = await auth.get('/friends/requests');
       const requests = await res.json();
       setRequests(requests);
-      console.log('friend requests:', JSON.stringify(requests, null, 2));
     } catch (err) {
       console.log(err);
     }
@@ -23,7 +22,6 @@ export const FriendsProvider = ({ children }) => {
       const res = await auth.get('/friends');
       const data = await res.json();
       setFriends(data.friends);
-      console.log('friends:', JSON.stringify(data.friends, null, 2));
     } catch (err) {
       console.log(err);
     }

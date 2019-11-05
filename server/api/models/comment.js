@@ -6,9 +6,10 @@ const CommentSchema = new mongoose.Schema({
     ref: 'User',
     required: true
   },
-  body: {
-    type: String,
-    required: true
+  parent: {
+    type: mongoose.SchemaTypes.ObjectId,
+    ref: 'Comment',
+    default: null
   },
   replies: [
     {
@@ -16,6 +17,10 @@ const CommentSchema = new mongoose.Schema({
       ref: 'Comment'
     }
   ],
+  body: {
+    type: String,
+    required: true
+  },
   likes: {
     type: mongoose.SchemaTypes.ObjectId,
     ref: 'User'

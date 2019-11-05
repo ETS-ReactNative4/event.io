@@ -9,7 +9,7 @@ export default function LoadingScreen({ navigation }) {
         ? auth.refreshToken(token).then(success => {
             success ? navigation.navigate('App') : navigation.navigate('Auth');
           })
-        : this.props.navigation.navigate('Auth');
+        : navigation.navigate('Auth');
     });
   }, []);
   return (

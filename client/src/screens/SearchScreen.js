@@ -39,7 +39,7 @@ export default function SearchScreen() {
   };
 
   return (
-    <View style={{ flex: 1 }}>
+    <View>
       <View style={styles.searchbar}>
         <Icon style={styles.icon} name="search" />
         <BaseTextInput
@@ -50,21 +50,12 @@ export default function SearchScreen() {
           style={styles.searchInput}
         />
       </View>
-
       <FlatList
         data={searchUsers}
         renderItem={({ item }) => (
-          <BaseUserListItem user={item}>
-            <View style={{ marginLeft: 'auto' }}>
-              {!isFriend(item._id) && (
-                <Icon
-                  style={{ fontSize: 32 }}
-                  onPress={() => sendFriendRequest(item._id)}
-                  name="person-add"
-                />
-              )}
-            </View>
-          </BaseUserListItem>
+          <BaseUserListItem
+            style={{ backgroundColor: '#ddd', padding: 12 }}
+            user={item}></BaseUserListItem>
         )}
         keyExtractor={item => item._id}
       />

@@ -6,7 +6,7 @@ import Icon from '../components/Icon';
 import ExploreScreen from './ExploreScreen';
 import NoteScreen from './NoteScreen';
 import CameraScreen from './CameraScreeen';
-import NotesDetailsScreen from './NoteDetailsScreen';
+import PostDetailsScreen from './PostDetailsScreen';
 import LoginScreen from './LoginScreen';
 import SettingsScreen from './SettingsScreen';
 import LoadingScreen from './LoadingScreen';
@@ -17,6 +17,7 @@ import FriendRequestsScreen from './FriendRequestsScreen';
 import FriendsScreen from './FriendsScreen';
 import ProfileIcon from '../components/ProfileIcon';
 import OtherProfileScreen from './OtherProfileScreen';
+import CommentsScreen from './CommentsScreen';
 
 const AuthNavigator = createStackNavigator({
   Login: {
@@ -27,24 +28,23 @@ const AuthNavigator = createStackNavigator({
 const ExploreStack = createStackNavigator({
   Explore: ExploreScreen,
   Note: NoteScreen,
-  NoteDetails: NotesDetailsScreen,
+  PostDetails: PostDetailsScreen,
   Camera: CameraScreen,
-});
-
-const SearchStack = createStackNavigator({
-  Search: SearchScreen,
 });
 
 const FeedStack = createStackNavigator({
   Feed: FeedScreen,
+  PostDetails: PostDetailsScreen,
+  Profile: ProfileScreen,
 });
 
 const ProfileStack = createStackNavigator({
   Profile: ProfileScreen,
   FriendRequests: FriendRequestsScreen,
   Friends: FriendsScreen,
-  OtherProfile: OtherProfileScreen,
-  NoteDetails: NotesDetailsScreen,
+  PostDetails: PostDetailsScreen,
+  Post: NoteScreen,
+  Comments: CommentsScreen,
 });
 
 const SettingsStack = createStackNavigator({
@@ -53,7 +53,6 @@ const SettingsStack = createStackNavigator({
 
 const BottomNavigator = createBottomTabNavigator(
   {
-    Search: SearchStack,
     Explore: ExploreStack,
     Feed: FeedStack,
     Profile: ProfileStack,
@@ -67,9 +66,6 @@ const BottomNavigator = createBottomTabNavigator(
         switch (navigation.state.routeName) {
           case 'Explore': {
             return <Icon style={style} name="navigate" />;
-          }
-          case 'Search': {
-            return <Icon style={style} name="search" />;
           }
           case 'Settings': {
             return <Icon style={style} name="settings" />;

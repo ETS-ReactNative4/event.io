@@ -5,20 +5,32 @@ import {
   TouchableOpacity,
   LayoutAnimation,
   Text,
+  FlatList,
 } from 'react-native';
 import Icon from '../components/Icon';
+import { withNavigation } from 'react-navigation';
+
+import Like from '../components/Like';
 import BaseMutilineTextInput from '../components/BaseMultilineTextInput';
-import { AuthContext } from '../context/AuthContext';
 
 const styles = StyleSheet.create({
   container: {
-    marginTop: 24,
+    marginTop: 12,
     paddingVertical: 3,
   },
+  iconContainer: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    minWidth: 48,
+    marginRight: 12,
+  },
   icon: {
-    marginRight: 22,
     fontSize: 24,
     color: 'gray',
+  },
+  counter: {
+    fontWeight: 'bold',
+    marginLeft: 3,
   },
 });
 
@@ -28,27 +40,26 @@ const Comment = ({ comment }) => {
 
 const CommentSection = ({ comments }) => {
   return (
-    <View>
-      {comments &&
-        comments.map(el => {
-          <Comment comment={el} />;
-        })}
-      <BaseMutilineTextInput placeholder="Write your comment here" />
+    <View
+      style={{ borderTopWidth: 1, borderTopColor: 'lightgray', marginTop: 6 }}>
+      {comments ? (
+        <FlatList
+          data={comments}
+          keyExtractor={item => item._id}
+          renderItem={({ item }) => <Comment comment={item} />}
+        />
+      ) : (
+        <Text style={{ color: 'lightgray' }}>No Comments</Text>
+      )}
     </View>
   );
 };
 
-export default PostOptions = ({ post }) => {
-  const [like, setLike] = useState(false);
+const PostOptions = ({ post, navigation, setPost }) => {
   const [comment, setComment] = useState(false);
-  const likeIconStyle = like ? { color: '#d9534f' } : { color: 'gray' };
-  const commentIconStyle = comment ? { color: '#428bca' } : { color: 'gray' };
-  const auth = useContext(AuthContext);
-
-  useEffect(() => {
-    console.log('component did mount');
-    setLike(post.likes.includes(auth.user.uid));
-  }, []);
+  const commentIconStyle = comment
+    ? { color: '#428bca' }
+    : { color: styles.icon.color };
 
   function toggleCommentSection() {
     LayoutAnimation.configureNext(
@@ -60,36 +71,25 @@ export default PostOptions = ({ post }) => {
     );
     setComment(!comment);
   }
-
-  async function onLike() {
-    const res = await auth.get(`/posts/${post._id}/likes`, {
-      method: 'post',
-      headers: {
-        'content-type': 'application/json',
-      },
-      body: JSON.stringify({ like: !like }),
-    });
-    const data = await res.json();
-    setLike(!like);
-  }
-
   return (
     <View style={styles.container}>
-      <Text style={{ paddingVertical: 6, fontSize: 12, fontWeight: 'bold' }}>
-        Likes {post.likes.length}
-      </Text>
-      <View style={{ flexDirection: 'row' }}>
-        <TouchableOpacity onPress={onLike}>
-          <Icon
-            style={[styles.icon, likeIconStyle]}
-            name={like ? 'heart' : 'heart'}
-          />
-        </TouchableOpacity>
-        <TouchableOpacity onPress={toggleCommentSection}>
-          <Icon style={[styles.icon, commentIconStyle]} name="text" />
-        </TouchableOpacity>
+      <View style={{ flexDirection: 'row', alignItems: 'center' }}>
+        <Like post={post} setPost={setPost} />
+        <View style={styles.iconContainer}>
+          <TouchableOpacity onPress={toggleCommentSection}>
+            <Icon style={[styles.icon, commentIconStyle]} name="chatbubbles" />
+          </TouchableOpacity>
+          <Text style={styles.counter}>{post.posts.length}</Text>
+        </View>
+        <View style={styles.iconContainer}>
+          <TouchableOpacity onPress={() => navigation.push('Post', { post })}>
+            <Icon style={[styles.icon]} name="create" />
+          </TouchableOpacity>
+        </View>
       </View>
-      {comment && <CommentSection />}
+      {comment && <CommentSection comments={post.posts} />}
     </View>
   );
 };
+
+export default withNavigation(PostOptions);

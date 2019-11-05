@@ -1,5 +1,12 @@
 import React, { Component } from 'react';
-import { LayoutAnimation, ScrollView, Text, View, Alert } from 'react-native';
+import {
+  LayoutAnimation,
+  ScrollView,
+  Text,
+  View,
+  Alert,
+  KeyboardAvoidingView,
+} from 'react-native';
 import { AuthContext } from '../context/AuthContext';
 import ImagePage from '../components/ImagePage';
 import img from '../assets/login.jpeg';
@@ -46,7 +53,9 @@ class LoginScreen extends Component {
 
   render() {
     return (
-      <ImagePage src={img}>
+      <KeyboardAvoidingView
+        behavior="padding"
+        style={{ backgroundColor: 'indigo', flex: 1 }}>
         <ScrollView
           contentContainerStyle={{
             zIndex: 1,
@@ -72,7 +81,7 @@ class LoginScreen extends Component {
             )}
           </FadeIn>
         </ScrollView>
-      </ImagePage>
+      </KeyboardAvoidingView>
     );
   }
 }

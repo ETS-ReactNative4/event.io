@@ -3,6 +3,7 @@ import { View, Text, FlatList } from 'react-native';
 import { AuthContext } from '../context/AuthContext';
 import { FriendsContext } from '../context/FriendsContext';
 import BaseUserListItem from '../components/BaseUserListItem';
+import Avatar from '../components/Avatar';
 
 export default FriendsScreen = ({ navigation }) => {
   const authCtx = useContext(AuthContext);
@@ -11,7 +12,7 @@ export default FriendsScreen = ({ navigation }) => {
   async function getUserDetails(id) {
     const res = await authCtx.get(`/user/${id}`);
     const data = await res.json();
-    navigation.navigate('OtherProfile', { user: data });
+    navigation.push('Profile', { id: id });
   }
 
   return (
