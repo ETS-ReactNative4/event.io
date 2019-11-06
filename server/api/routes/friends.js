@@ -1,18 +1,18 @@
-const router = require('express').Router();
-const db = require('../models');
-const authCheck = require('../middleware/jwtCheck');
+const router = require('express').Router()
+const db = require('../models')
+const authCheck = require('../middleware/jwtCheck')
 
 router.get('/', authCheck, async (req, res) => {
   try {
     const friends = await db.User.findById(req.user.uid)
       .populate('friends', '-email -password -friends')
-      .select('friends');
-    res.json(friends);
+      .select('friends')
+    res.json(friends)
   } catch (err) {
-    console.log(err);
-    res.status(500).end();
+    console.log(err)
+    res.status(500).end()
   }
-});
+})
 
 // get all requests that user has recieved
 router.get('/requests', authCheck, async (req, res) => {
@@ -20,13 +20,13 @@ router.get('/requests', authCheck, async (req, res) => {
     const friendRequests = await db.FriendRequest.find({
       to: req.user.uid,
       closed: false
-    }).populate('from to', '-password -email');
-    res.json(friendRequests);
+    }).populate('from to', '-password -email')
+    res.json(friendRequests)
   } catch (err) {
-    console.error(err);
-    res.status(500).end();
+    console.error(err)
+    res.status(500).end()
   }
-});
+})
 
 // get all requests that user has sent
 router.get('/requests/sent', authCheck, async (req, res) => {
@@ -34,101 +34,95 @@ router.get('/requests/sent', authCheck, async (req, res) => {
     const requests = await db.FriendRequest.find({ from: req.user.id, closed: false }).populate(
       'from to',
       '-password -email'
-    );
-    res.json(requests);
+    )
+    res.json(requests)
   } catch (err) {
-    console.log(err);
-    res.status(500).end();
+    console.log(err)
+    res.status(500).end()
   }
-});
+})
 
 // create friend request
 router.post('/requests', authCheck, async (req, res) => {
   try {
-    const { to } = req.body;
+    const { to } = req.body
     // check if request already exists
-    let exists = await db.FriendRequest.findOne({ to, from: req.user.uid });
-    if (exists) return res.status(409).end();
+    let exists = await db.FriendRequest.findOne({ to, from: req.user.uid })
+    if (exists) return res.status(409).end()
     // check if already friends
-    const user = await db.User.findById(req.user.uid);
-    if (user.friends.includes(to)) return res.status(409).end();
+    const user = await db.User.findById(req.user.uid)
+    if (user.friends.includes(to)) return res.status(409).end()
     // create friend request
     const friendRequest = await db.FriendRequest.create({
       to,
       from: req.user.uid,
       accepted: false,
       issuedAt: Date.now()
-    });
+    })
     // emit socket event to recepient
-    const socketId = req.sockets[to];
+    const socketId = req.sockets[to]
     if (socketId) {
-      req.io.to(socketId).emit('friendRequest');
+      req.io.to(socketId).emit('friendRequest')
     }
     // return created request
-    res.status(201).json(friendRequest);
+    res.status(201).json(friendRequest)
   } catch (err) {
-    console.error(err);
-    res.status(500).end();
+    console.error(err)
+    res.status(500).end()
   }
-});
+})
 
 // accept or decline friend request
 router.put('/requests/:id', authCheck, async (req, res) => {
   try {
-    const { accepted } = req.body;
+    const { accepted } = req.body
     if (accepted === undefined || accepted === null) {
-      return res.status(400).end();
+      return res.status(400).end()
     }
     // get friend request document
-    const friendRequest = await db.FriendRequest.findById(req.params.id);
+    const friendRequest = await db.FriendRequest.findById(req.params.id)
     // document not found
     if (!friendRequest) {
-      console.log('request not found');
-      return res.status(404).end();
+      console.log('request not found')
+      return res.status(404).end()
     }
     // documents reciepient is not user
     if (friendRequest.to.toString() !== req.user.uid.toString()) {
-      console.log('no match');
-      console.log(friendRequest.to, req.user.uid);
-      return res.status(401).end();
+      console.log('no match')
+      console.log(friendRequest.to, req.user.uid)
+      return res.status(401).end()
     }
     // update documents in database
     await db.FriendRequest.updateOne(
       { _id: req.params.id },
       { accepted, resolvedAt: Date.now(), closed: true }
-    );
+    )
     // emit completed event
-    const toSocketId = req.sockets[friendRequest.to];
+    const toSocketId = req.sockets[friendRequest.to]
     if (toSocketId) {
-      req.io.to(toSocketId).emit('friendRequest');
+      req.io.to(toSocketId).emit('friendRequest')
     }
-    const fromSocketId = req.sockets[friendRequest.from];
+    const fromSocketId = req.sockets[friendRequest.from]
     if (fromSocketId) {
-      req.io.to(fromSocketId).emit('friendRequest');
+      req.io.to(fromSocketId).emit('friendRequest')
     }
     if (accepted) {
-      await db.User.updateOne(
-        { _id: friendRequest.to },
-        { $push: { friends: friendRequest.from } }
-      );
-      await db.User.updateOne(
-        { _id: friendRequest.from },
-        { $push: { friends: friendRequest.to } }
-      );
+      await db.User.updateOne({ _id: friendRequest.to }, { $push: { friends: friendRequest.from } })
+      await db.User.updateOne({ _id: friendRequest.from }, { $push: { friends: friendRequest.to } })
       if (toSocketId) {
-        req.io.to(toSocketId).emit('friend');
+        req.io.to(toSocketId).emit('friend')
       }
       if (fromSocketId) {
-        req.io.to(fromSocketId).emit('friend');
+        req.io.to(fromSocketId).emit('friend')
       }
-      res.json(friendRequest);
+      res.json(friendRequest)
     } else {
-      res.json({});
+      res.json({})
     }
   } catch (err) {
-    console.log(err);
-    res.status(500).end();
+    console.log(err)
+    res.status(500).end()
   }
-});
+})
 
-module.exports = router;
+module.exports = router

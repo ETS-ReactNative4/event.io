@@ -9,9 +9,9 @@ import {
 } from 'react-native';
 import Icon from '../components/Icon';
 import { withNavigation } from 'react-navigation';
-
 import Like from '../components/Like';
-import BaseMutilineTextInput from '../components/BaseMultilineTextInput';
+import { AuthContext } from '../context/AuthContext';
+import PostListItem from '../components/PostListItem';
 
 const styles = StyleSheet.create({
   container: {
@@ -35,7 +35,7 @@ const styles = StyleSheet.create({
 });
 
 const Comment = ({ comment }) => {
-  return <View></View>;
+  return <PostListItem post={comment} />;
 };
 
 const CommentSection = ({ comments }) => {
@@ -43,11 +43,7 @@ const CommentSection = ({ comments }) => {
     <View
       style={{ borderTopWidth: 1, borderTopColor: 'lightgray', marginTop: 6 }}>
       {comments ? (
-        <FlatList
-          data={comments}
-          keyExtractor={item => item._id}
-          renderItem={({ item }) => <Comment comment={item} />}
-        />
+        comments.map(post => <PostListItem post={post} />)
       ) : (
         <Text style={{ color: 'lightgray' }}>No Comments</Text>
       )}
@@ -57,6 +53,20 @@ const CommentSection = ({ comments }) => {
 
 const PostOptions = ({ post, navigation, setPost }) => {
   const [comment, setComment] = useState(false);
+  const [comments, setComments] = useState([]);
+  const auth = useContext(AuthContext);
+
+  useEffect(() => {
+    getComments();
+  }, []);
+
+  async function getComments() {
+    const res = await auth.get(`/posts/${post._id}/comments`);
+    const comments = await res.json();
+    console.log('comments', JSON.stringify(comments, null, 2));
+    setComments(comments.posts);
+  }
+
   const commentIconStyle = comment
     ? { color: '#428bca' }
     : { color: styles.icon.color };
@@ -71,6 +81,7 @@ const PostOptions = ({ post, navigation, setPost }) => {
     );
     setComment(!comment);
   }
+
   return (
     <View style={styles.container}>
       <View style={{ flexDirection: 'row', alignItems: 'center' }}>
@@ -87,7 +98,7 @@ const PostOptions = ({ post, navigation, setPost }) => {
           </TouchableOpacity>
         </View>
       </View>
-      {comment && <CommentSection comments={post.posts} />}
+      {comment && <CommentSection comments={comments} />}
     </View>
   );
 };

@@ -27,11 +27,17 @@ export default class RegisterForm extends React.Component {
         <FormInput
           label="Email"
           placeholder="example@example.com"
+          autoCapitalize={false}
+          autoCompleteType="off"
+          autoCorrect={false}
           onChangeText={email => (this.email = email)}
         />
         <FormInput
           label="Username"
           onChangeText={username => (this.username = username)}
+          autoCapitalize={false}
+          autoCompleteType="off"
+          autoCorrect={false}
         />
         <FormInput
           label="Password"

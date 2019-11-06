@@ -2,7 +2,6 @@ import React from 'react';
 import { TouchableOpacity, StyleSheet, Text, View, Switch } from 'react-native';
 import Slider from 'react-native-slider';
 import BaseMultiLineTextInput from '../components/BaseMultilineTextInput';
-import BaseTextInput from '../components/BaseTextInput';
 import PageView from '../components/PageView';
 import { AuthContext } from '../context/AuthContext';
 
@@ -34,7 +33,7 @@ export default class NoteView extends React.Component {
     });
     if (res.ok) {
       try {
-        this.props.navigation.navigate('Explore');
+        this.props.navigation.goBack();
       } catch (err) {
         console.log(err);
       }
