@@ -78,7 +78,7 @@ export default class Home extends React.Component {
           })}
           <Icon
             style={styles.icon}
-            onPress={() => this.props.navigation.navigate('Note')}
+            onPress={() => this.props.navigation.navigate('Post')}
             name="add-circle"
           />
           <Icon

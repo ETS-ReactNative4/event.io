@@ -10,8 +10,8 @@ router.get('/', tokenVerification, async (req, res) => {
     friends.push(req.user.uid);
     // if possible one query
     // friends []  to obj of $eq: friend[0]
-    const posts = await db.Post.find({ author: { $in: friends } })
-      .populate('author', '-email -password')
+    const posts = await db.Post.find({ user: { $in: friends }, parent: null })
+      .populate('user', '-email -password')
       .sort({ createdAt: -1 });
     res.json(posts);
   } catch (err) {

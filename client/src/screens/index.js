@@ -1,10 +1,11 @@
 import React from 'react';
+import { TouchableOpacity } from 'react-native';
 import { createAppContainer, createSwitchNavigator } from 'react-navigation';
 import { createStackNavigator } from 'react-navigation-stack';
 import { createBottomTabNavigator } from 'react-navigation-tabs';
 import Icon from '../components/Icon';
 import ExploreScreen from './ExploreScreen';
-import NoteScreen from './NoteScreen';
+import PostScreen from './PostScreen';
 import CameraScreen from './CameraScreeen';
 import PostDetailsScreen from './PostDetailsScreen';
 import LoginScreen from './LoginScreen';
@@ -16,7 +17,6 @@ import ProfileScreen from './ProfileScreen';
 import FriendRequestsScreen from './FriendRequestsScreen';
 import FriendsScreen from './FriendsScreen';
 import ProfileIcon from '../components/ProfileIcon';
-import OtherProfileScreen from './OtherProfileScreen';
 import CommentsScreen from './CommentsScreen';
 
 const AuthNavigator = createStackNavigator({
@@ -27,14 +27,14 @@ const AuthNavigator = createStackNavigator({
 
 const ExploreStack = createStackNavigator({
   Explore: ExploreScreen,
-  Note: NoteScreen,
   PostDetails: PostDetailsScreen,
+  Post: PostScreen,
   Camera: CameraScreen,
 });
 
 const FeedStack = createStackNavigator({
   Feed: FeedScreen,
-  PostDetails: PostDetailsScreen,
+  Post: PostScreen,
   Profile: ProfileScreen,
 });
 
@@ -43,7 +43,7 @@ const ProfileStack = createStackNavigator({
   FriendRequests: FriendRequestsScreen,
   Friends: FriendsScreen,
   PostDetails: PostDetailsScreen,
-  Post: NoteScreen,
+  Post: PostScreen,
   Comments: CommentsScreen,
 });
 
@@ -60,7 +60,7 @@ const BottomNavigator = createBottomTabNavigator(
   },
   {
     defaultNavigationOptions: ({ navigation }) => ({
-      tabBarIcon: ({ focused, horizontal, tintColor }) => {
+      tabBarIcon: ({ focused, tintColor }) => {
         const color = focused ? '#0275d8' : 'gray';
         const style = { fontSize: 32, color };
         switch (navigation.state.routeName) {
@@ -79,12 +79,11 @@ const BottomNavigator = createBottomTabNavigator(
         }
       },
     }),
+    resetOnBlur: true,
     tabBarOptions: {
       showLabel: false,
-      activeTintColor: 'black',
-      inactiveTintColor: 'gray',
     },
-    initialRouteName: 'Explore',
+    initialRouteName: 'Feed',
   },
 );
 

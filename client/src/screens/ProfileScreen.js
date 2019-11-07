@@ -1,18 +1,12 @@
 import React, { useContext, useEffect, useState } from 'react';
-import {
-  Button,
-  View,
-  StyleSheet,
-  Text,
-  KeyboardAvoidingView,
-} from 'react-native';
+import { Button, View, StyleSheet, Text } from 'react-native';
 import { ScrollView, FlatList } from 'react-navigation';
 import Badge from '../components/Badge';
 import { FriendsContext } from '../context/FriendsContext';
 import { AuthContext } from '../context/AuthContext';
 import Avatar from '../components/Avatar';
 import ScreenListItem from '../components/ScreenListItem';
-import PostListItem from '../components/PostListItem';
+import PostListItemContainer from '../components/PostListItemContainer';
 import { useHttp } from '../hooks/http';
 import Icon from '../components/Icon';
 
@@ -57,9 +51,9 @@ const ProfileScreen = ({ navigation }) => {
   }
 
   return (
-    <ScrollView>
+    <>
       {data ? (
-        <View>
+        <View style={{ flex: 1 }}>
           <View style={styles.header}>
             <Avatar size={128} user={data.user} />
             <View style={{ marginLeft: 32 }}>
@@ -89,8 +83,11 @@ const ProfileScreen = ({ navigation }) => {
           {data.relationship !== 'other' ? (
             data.posts.length > 0 ? (
               <FlatList
+                keyExtractor={item => item._id}
                 data={data.posts.reverse()}
-                renderItem={({ item }) => <PostListItem post={item} />}
+                renderItem={({ item }) => (
+                  <PostListItemContainer id={item._id} />
+                )}
               />
             ) : (
               <Text style={{ fontSize: 22, margin: 12 }}>
@@ -112,7 +109,7 @@ const ProfileScreen = ({ navigation }) => {
       ) : (
         <Text>Loading</Text>
       )}
-    </ScrollView>
+    </>
   );
 };
 ProfileScreen.navigationOptions = function({ navigation }) {

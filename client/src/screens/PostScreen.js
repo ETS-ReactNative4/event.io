@@ -2,16 +2,15 @@ import React from 'react';
 import { TouchableOpacity, StyleSheet, Text, View, Switch } from 'react-native';
 import Slider from 'react-native-slider';
 import BaseMultiLineTextInput from '../components/BaseMultilineTextInput';
-import PageView from '../components/PageView';
 import { AuthContext } from '../context/AuthContext';
+import PostListItemContainer from '../components/PostListItemContainer';
 
-export default class NoteView extends React.Component {
+export default class PostScreen extends React.Component {
   static contextType = AuthContext;
   static navigationOptions = {
     title: 'Post',
   };
   state = {
-    title: '',
     body: '',
     expiryDate: '30m',
   };
@@ -19,6 +18,8 @@ export default class NoteView extends React.Component {
   submitPost = async () => {
     if (!this.state.body) return console.log('must provide title and body');
     const post = this.props.navigation.getParam('post', null);
+    const setPost = this.props.navigation.getParam('setPost', null);
+
     const url = post ? `/posts/${post._id}` : '/posts';
     const res = await this.context.get(url, {
       method: 'post',
@@ -33,6 +34,8 @@ export default class NoteView extends React.Component {
     });
     if (res.ok) {
       try {
+        const data = await res.json();
+        setPost(data);
         this.props.navigation.goBack();
       } catch (err) {
         console.log(err);
@@ -71,9 +74,23 @@ export default class NoteView extends React.Component {
 
   render() {
     return (
-      <View style={styles.background}>
-        <PageView style={styles.background}>
+      <View style={{ flex: 1 }}>
+        {this.props.navigation.getParam('post', null) && (
+          <View>
+            <PostListItemContainer
+              id={this.props.navigation.getParam('post')._id}
+              showOptions={false}
+            />
+            <View
+              style={{
+                borderBottomWidth: 1,
+                borderBottomColor: 'lightgray',
+              }}></View>
+          </View>
+        )}
+        <View style={{ flex: 1, paddingHorizontal: 24 }}>
           <BaseMultiLineTextInput
+            autoFocus={true}
             returnKeyType="done"
             style={styles.bodyContainer}
             placeholder="Enter text here."
@@ -96,7 +113,7 @@ export default class NoteView extends React.Component {
             style={styles.button}>
             <Text style={styles.buttonLabel}>Share</Text>
           </TouchableOpacity>
-        </PageView>
+        </View>
       </View>
     );
   }
@@ -114,21 +131,10 @@ const styles = StyleSheet.create({
     fontSize: 16,
     color: 'white',
   },
-  background: {
-    backgroundColor: 'white',
-    flex: 1,
-  },
+  background: {},
   expiryLabel: {
     fontStyle: 'italic',
     marginBottom: 24,
   },
-  titleContainer: {
-    borderBottomWidth: 1,
-    borderBottomColor: 'lightgray',
-    backgroundColor: 'white',
-    paddingBottom: '5%',
-  },
-  bodyContainer: {
-    flex: 1,
-  },
+  bodyContainer: { flex: 1 },
 });

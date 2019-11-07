@@ -16,8 +16,8 @@ router.get('/:uid', tokenVerification, async (req, res) => {
   switch (relationship) {
     case 'self': {
       try {
-        const posts = await db.Post.find({ author: user.id }).populate(
-          'author',
+        const posts = await db.Post.find({ user: user.id, parent: null }).populate(
+          'user',
           '-email -password'
         );
         res.json({
@@ -39,8 +39,8 @@ router.get('/:uid', tokenVerification, async (req, res) => {
     case 'friend': {
       try {
         const friend = await db.User.findById(req.params.uid).select('-email -password');
-        const posts = await db.Post.find({ author: req.params.uid }).populate(
-          'author',
+        const posts = await db.Post.find({ user: req.params.uid }).populate(
+          'user',
           '-email -password'
         );
         res.json({
