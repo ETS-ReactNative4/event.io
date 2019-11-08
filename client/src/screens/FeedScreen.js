@@ -4,31 +4,16 @@ import { FlatList } from 'react-navigation';
 import PostListItemContainer from '../components/PostListItemContainer';
 import SearchScreen from '../screens/SearchScreen';
 import { PostContext } from '../context/PostContext';
-import { AuthContext } from '../context/AuthContext';
 
 const FeedScreen = orops => {
-  const [posts, setPosts] = useState([]);
-  const authCtx = useContext(AuthContext);
-  useEffect(() => {
-    onMount();
-  }, []);
-
-  async function onMount() {
-    try {
-      const res = await authCtx.get('/feed');
-      const posts = await res.json();
-      setPosts(posts);
-    } catch (err) {
-      console.log('Error::FeedScreen::onMount', err);
-    }
-  }
+  const postCtx = useContext(PostContext);
 
   return (
     <View style={{ flex: 1 }}>
       <SearchScreen />
-      {posts ? (
+      {postCtx.feed ? (
         <FlatList
-          data={posts}
+          data={postCtx.feed}
           keyExtractor={item => item._id}
           renderItem={({ item }) => <PostListItemContainer id={item._id} />}
         />

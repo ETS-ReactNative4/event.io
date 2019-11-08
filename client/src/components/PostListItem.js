@@ -29,7 +29,6 @@ const PostListItem = ({
     }
     // get children first
     const loadedChildren = [];
-
     for (let child of post.children) {
       loadedChildren.push(postCtx.getPost(child));
     }
@@ -45,6 +44,12 @@ const PostListItem = ({
     });
   }
 
+  function forwardReply() {
+    onReply();
+    setTimeout(() => {
+      setCommentToggle(true);
+    }, 500);
+  }
   const content = (
     <>
       <View
@@ -75,7 +80,7 @@ const PostListItem = ({
                 onLike={onLike}
                 commentToggle={commentToggle}
                 onComment={toggleCommentDisplay}
-                onReply={onReply}
+                onReply={forwardReply}
               />
             </View>
           )}

@@ -1,18 +1,21 @@
 import React, { useContext, useEffect, useState } from 'react';
 import { Button, View, StyleSheet, Text } from 'react-native';
-import { ScrollView, FlatList } from 'react-navigation';
+import { FlatList } from 'react-navigation';
 import Badge from '../components/Badge';
 import { FriendsContext } from '../context/FriendsContext';
 import { AuthContext } from '../context/AuthContext';
 import Avatar from '../components/Avatar';
 import ScreenListItem from '../components/ScreenListItem';
 import PostListItemContainer from '../components/PostListItemContainer';
-import { useHttp } from '../hooks/http';
 import Icon from '../components/Icon';
+import { PostContext } from '../context/PostContext';
 
 const ProfileScreen = ({ navigation }) => {
+  // all contexts
   const authCtx = useContext(AuthContext);
   const friendsCtx = useContext(FriendsContext);
+  const postCtx = useContext(PostContext);
+  // state
   const [data, setData] = useState(null);
   const [requestSent, setRequestSent] = useState(null);
   const profileId = navigation.getParam(
@@ -20,15 +23,16 @@ const ProfileScreen = ({ navigation }) => {
     authCtx.user ? authCtx.user.uid : null,
   );
 
-  const [res, err] = useHttp(`/profile/${profileId}`);
-  res && res.then(data => setData(data));
-  err && console.log(err);
+  navigation.on;
 
   useEffect(() => {
-    if (data && data.relationship === 'other') {
-      getSentRequests();
-    }
-  }, [data]);
+    postCtx.getProfile(profileId).then(data => {
+      setData(data);
+      if (data && data.relationship === 'other') {
+        getSentRequests();
+      }
+    });
+  }, []);
 
   async function getSentRequests() {
     const res = await authCtx.get('/friends/requests/sent');
@@ -73,11 +77,13 @@ const ProfileScreen = ({ navigation }) => {
           </View>
 
           {data.relationship === 'self' && friendsCtx.requests.length > 0 && (
-            <ScreenListItem
-              onPress={() => navigation.navigate('FriendRequests')}
-              text="Requests">
-              <Badge text={friendsCtx.requests.length} />
-            </ScreenListItem>
+            <View style={{ paddingHorizontal: 22 }}>
+              <ScreenListItem
+                onPress={() => navigation.navigate('FriendRequests')}
+                text="Requests">
+                <Badge text={friendsCtx.requests.length} />
+              </ScreenListItem>
+            </View>
           )}
 
           {data.relationship !== 'other' ? (

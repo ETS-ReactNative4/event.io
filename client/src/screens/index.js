@@ -1,5 +1,4 @@
 import React from 'react';
-import { TouchableOpacity } from 'react-native';
 import { createAppContainer, createSwitchNavigator } from 'react-navigation';
 import { createStackNavigator } from 'react-navigation-stack';
 import { createBottomTabNavigator } from 'react-navigation-tabs';
@@ -11,7 +10,6 @@ import PostDetailsScreen from './PostDetailsScreen';
 import LoginScreen from './LoginScreen';
 import SettingsScreen from './SettingsScreen';
 import LoadingScreen from './LoadingScreen';
-import SearchScreen from './SearchScreen';
 import FeedScreen from './FeedScreen';
 import ProfileScreen from './ProfileScreen';
 import FriendRequestsScreen from './FriendRequestsScreen';

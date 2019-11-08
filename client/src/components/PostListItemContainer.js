@@ -10,8 +10,8 @@ const PostListItemContainer = ({ id, navigation, showAvatar, showOptions }) => {
   const postctx = useContext(PostContext);
 
   useEffect(() => {
-    postctx.getPost(id).then(post => setPost(post));
-  }, [postctx.posts[id]]);
+    postctx.initialized && getPost();
+  }, [postctx.initialized]);
 
   async function onLike(like) {
     try {
@@ -25,7 +25,7 @@ const PostListItemContainer = ({ id, navigation, showAvatar, showOptions }) => {
       if (res.ok) {
         const data = await res.json();
         postctx.setPost(id, data);
-        //setPost(data);
+        setPost(data);
       } else {
         console.log('error posting like to server', res);
       }
@@ -34,13 +34,18 @@ const PostListItemContainer = ({ id, navigation, showAvatar, showOptions }) => {
     }
   }
 
+  function getPost() {
+    postctx.getPost(id).then(post => setPost(post));
+  }
+
   function onComment(isComment) {
     isComment ? null : null;
   }
 
   function onReply() {
     function attatchSetPost(post) {
-      console.log('attatch successfull');
+      postctx.setPost(id, post);
+      getPost();
     }
     navigation.push('Post', { post, setPost: attatchSetPost.bind(this) });
   }
