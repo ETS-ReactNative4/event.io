@@ -16,10 +16,9 @@ router.get('/:uid', tokenVerification, async (req, res) => {
   switch (relationship) {
     case 'self': {
       try {
-        const posts = await db.Post.find({ user: user.id, parent: null }).populate(
-          'user',
-          '-email -password'
-        );
+        const posts = await db.Post.find({ user: user.id, parent: null })
+          .populate('user', '-email -password')
+          .sort({ createdAt: -1 });
         res.json({
           user: {
             uid: user.id,

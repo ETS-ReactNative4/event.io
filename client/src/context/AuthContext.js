@@ -50,6 +50,7 @@ export class AuthProvider extends Component {
             sid: this.state.socket.id,
           });
       const res = await fetch(baseUrl + url, options);
+      console.log;
       console.log('AuthContext::get::', url);
       return res;
     },

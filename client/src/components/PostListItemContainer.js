@@ -1,69 +1,41 @@
 import React, { useState, useEffect, useContext } from 'react';
+import { ActivityIndicator, View } from 'react-native';
 import PostListItem from './PostListItem';
 import { withNavigation } from 'react-navigation';
-import { AuthContext } from '../context/AuthContext';
 import { PostContext } from '../context/PostContext';
 
-const PostListItemContainer = ({ id, navigation, showAvatar, showOptions }) => {
-  const [post, setPost] = useState(null);
-  const auth = useContext(AuthContext);
-  const postctx = useContext(PostContext);
-
-  useEffect(() => {
-    postctx.initialized && getPost();
-  }, [postctx.initialized]);
-
-  async function onLike(like) {
-    try {
-      const res = await auth.get(`/posts/${id}/likes`, {
-        method: 'post',
-        headers: {
-          'content-type': 'application/json',
-        },
-        body: JSON.stringify({ like: like }),
-      });
-      if (res.ok) {
-        const data = await res.json();
-        postctx.setPost(id, data);
-        setPost(data);
-      } else {
-        console.log('error posting like to server', res);
-      }
-    } catch (err) {
-      console.log(err);
-    }
-  }
-
-  function getPost() {
-    postctx.getPost(id).then(post => setPost(post));
-  }
-
-  function onComment(isComment) {
-    isComment ? null : null;
-  }
+function PostListItemContainer({ post, navigation, showAvatar, showOptions }) {
+  const { setLikePost } = useContext(PostContext);
 
   function onReply() {
-    function attatchSetPost(post) {
-      postctx.setPost(id, post);
-      getPost();
-    }
-    navigation.push('Post', { post, setPost: attatchSetPost.bind(this) });
+    navigation.push('Post', { post });
   }
 
   return (
     <>
-      {post && (
+      {post ? (
         <PostListItem
           showOptions={showOptions}
           showAvatar={showAvatar}
           post={post}
-          onLike={onLike}
-          onComment={onComment}
+          onLike={like => setLikePost(post._id, like)}
           onReply={onReply}
         />
+      ) : (
+        <View style={{ padding: 12, justifyContent: 'center' }}>
+          <ActivityIndicator />
+        </View>
       )}
     </>
   );
-};
+}
 
-export default withNavigation(PostListItemContainer);
+export default React.memo(
+  withNavigation(PostListItemContainer),
+  (prevProps, nextProps) => {
+    return (
+      prevProps.post.likes.length === nextProps.post.likes.length &&
+      prevProps.post.children === nextProps.post.children
+    );
+  },
+);

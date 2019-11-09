@@ -21,35 +21,21 @@ const PostListItem = ({
   showOptions = true,
 }) => {
   const [commentToggle, setCommentToggle] = useState(false);
-  const postCtx = useContext(PostContext);
+  const { posts, getPostChildren } = useContext(PostContext);
 
-  function toggleCommentDisplay() {
-    if (!post.children || post.children.length === 0) {
-      return;
-    }
-    // get children first
-    const loadedChildren = [];
-    for (let child of post.children) {
-      loadedChildren.push(postCtx.getPost(child));
-    }
-    Promise.all(loadedChildren).then(posts => {
-      LayoutAnimation.configureNext(
-        LayoutAnimation.create(
-          200,
-          LayoutAnimation.Types.easeInEaseOut,
-          LayoutAnimation.Properties.opacity,
-        ),
-      );
-      setCommentToggle(!commentToggle);
-    });
+  async function toggleCommentDisplay() {
+    if (!post.children || post.children.length === 0) return;
+    await getPostChildren(post._id);
+    LayoutAnimation.configureNext(
+      LayoutAnimation.create(
+        200,
+        LayoutAnimation.Types.easeInEaseOut,
+        LayoutAnimation.Properties.opacity,
+      ),
+    );
+    setCommentToggle(!commentToggle);
   }
 
-  function forwardReply() {
-    onReply();
-    setTimeout(() => {
-      setCommentToggle(true);
-    }, 500);
-  }
   const content = (
     <>
       <View
@@ -80,7 +66,7 @@ const PostListItem = ({
                 onLike={onLike}
                 commentToggle={commentToggle}
                 onComment={toggleCommentDisplay}
-                onReply={forwardReply}
+                onReply={onReply}
               />
             </View>
           )}
@@ -90,15 +76,18 @@ const PostListItem = ({
       {commentToggle && (
         <View>
           {post.parent === null && (
-            <Text
-              style={{
-                fontSize: 14,
-                fontWeight: 'bold',
-                paddingVertical: 6,
-                marginLeft: 12,
-              }}>
-              Comments
-            </Text>
+            <View>
+              <Text
+                style={{
+                  fontSize: 14,
+                  fontWeight: 'bold',
+                  paddingVertical: 12,
+                  color: 'gray',
+                  marginLeft: 18,
+                }}>
+                Comments
+              </Text>
+            </View>
           )}
           <View
             style={{
@@ -107,7 +96,9 @@ const PostListItem = ({
               borderLeftColor: 'lightgray',
             }}>
             {post.children.map(post => {
-              return <PostListItemContainer showAvatar={false} id={post} />;
+              return (
+                <PostListItemContainer showAvatar={false} post={posts[post]} />
+              );
             })}
           </View>
         </View>

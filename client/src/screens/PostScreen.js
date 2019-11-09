@@ -9,15 +9,15 @@ import { PostContext } from '../context/PostContext';
 PostScreen.navigationOptions = {
   title: 'Post',
 };
+
 export default function PostScreen({ navigation }) {
   const authCtx = useContext(AuthContext);
-  const postCtx = useContext(PostContext);
+  const { setPost, fetchFeed, fetchProfile } = useContext(PostContext);
   const [body, setBody] = useState('');
 
-  const submitPost = async () => {
+  const onSubmit = async () => {
     if (!body) return console.log('must provide title and body');
     const post = navigation.getParam('post', null);
-    const setPost = navigation.getParam('setPost', null);
     const url = post ? `/posts/${post._id}` : '/posts';
     const res = await authCtx.get(url, {
       method: 'post',
@@ -32,26 +32,16 @@ export default function PostScreen({ navigation }) {
     if (res.ok) {
       try {
         const data = await res.json();
-        if (!post || post === null) {
-          postCtx.refresh(authCtx.user.uid).then(() => {
-            navigation.goBack();
-          });
-          return;
+        setPost(data._id, data);
+        if (!post) {
+          fetchFeed();
+          fetchProfile(authCtx.user.uid);
         }
-        if (setPost) {
-          setPost(data);
-          navigation.goBack();
-        } else {
-          navigation.goBack();
-        }
+        navigation.goBack();
       } catch (err) {
         console.log(err);
       }
     } else [console.log('Error: Server resoonded with status', res.status)];
-  };
-
-  const canSubmit = () => {
-    return body;
   };
 
   return (
@@ -59,7 +49,7 @@ export default function PostScreen({ navigation }) {
       {navigation.getParam('post', null) && (
         <View>
           <PostListItemContainer
-            id={navigation.getParam('post')._id}
+            post={navigation.getParam('post')}
             showOptions={false}
           />
           <View
@@ -77,7 +67,7 @@ export default function PostScreen({ navigation }) {
           placeholder="Enter text here."
           onChangeText={text => setBody(text)}
         />
-        <TouchableOpacity onPress={submitPost} style={styles.button}>
+        <TouchableOpacity onPress={onSubmit} style={styles.button}>
           <Text style={styles.buttonLabel}>Share</Text>
         </TouchableOpacity>
       </View>

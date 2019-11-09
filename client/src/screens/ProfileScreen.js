@@ -1,5 +1,11 @@
 import React, { useContext, useEffect, useState } from 'react';
-import { Button, View, StyleSheet, Text } from 'react-native';
+import {
+  Button,
+  View,
+  StyleSheet,
+  Text,
+  ActivityIndicator,
+} from 'react-native';
 import { FlatList } from 'react-navigation';
 import Badge from '../components/Badge';
 import { FriendsContext } from '../context/FriendsContext';
@@ -10,30 +16,17 @@ import PostListItemContainer from '../components/PostListItemContainer';
 import Icon from '../components/Icon';
 import { PostContext } from '../context/PostContext';
 
-const ProfileScreen = ({ navigation }) => {
+function ProfileScreen({ navigation }) {
   // all contexts
   const authCtx = useContext(AuthContext);
   const friendsCtx = useContext(FriendsContext);
-  const postCtx = useContext(PostContext);
-  // state
-  const [data, setData] = useState(null);
+  const { getProfile, profiles, posts } = useContext(PostContext);
+  const id = navigation.getParam('id', authCtx.user ? authCtx.user.uid : null);
   const [requestSent, setRequestSent] = useState(null);
-  const profileId = navigation.getParam(
-    'id',
-    authCtx.user ? authCtx.user.uid : null,
-  );
-
-  navigation.on;
-
+  profile = profiles[id] ? profiles[id] : null;
   useEffect(() => {
-    postCtx.getProfile(profileId).then(data => {
-      setData(data);
-      if (data && data.relationship === 'other') {
-        getSentRequests();
-      }
-    });
+    getProfile(id);
   }, []);
-
   async function getSentRequests() {
     const res = await authCtx.get('/friends/requests/sent');
     const requests = await res.json();
@@ -56,17 +49,17 @@ const ProfileScreen = ({ navigation }) => {
 
   return (
     <>
-      {data ? (
+      {profile ? (
         <View style={{ flex: 1 }}>
           <View style={styles.header}>
-            <Avatar size={128} user={data.user} />
+            <Avatar size={128} user={profile.user} />
             <View style={{ marginLeft: 32 }}>
-              <Text style={styles.username}>{data.user.username}</Text>
-              {data.relationship !== 'other' ? (
+              <Text style={styles.username}>{profile.user.username}</Text>
+              {profile.relationship !== 'other' ? (
                 <Text
                   style={{ fontWeight: 'bold' }}
                   onPress={() => navigation.push('Friends')}>
-                  Friends {data.user.friends.length}
+                  Friends {profile.user.friends.length}
                 </Text>
               ) : requestSent ? (
                 <Text title="Request sent">Request Sent</Text>
@@ -76,7 +69,7 @@ const ProfileScreen = ({ navigation }) => {
             </View>
           </View>
 
-          {data.relationship === 'self' && friendsCtx.requests.length > 0 && (
+          {profile.relationship === 'self' && friendsCtx.requests.length > 0 && (
             <View style={{ paddingHorizontal: 22 }}>
               <ScreenListItem
                 onPress={() => navigation.navigate('FriendRequests')}
@@ -86,13 +79,13 @@ const ProfileScreen = ({ navigation }) => {
             </View>
           )}
 
-          {data.relationship !== 'other' ? (
-            data.posts.length > 0 ? (
+          {profile.relationship !== 'other' ? (
+            profile.posts.length > 0 ? (
               <FlatList
                 keyExtractor={item => item._id}
-                data={data.posts.reverse()}
+                data={profile.posts}
                 renderItem={({ item }) => (
-                  <PostListItemContainer id={item._id} />
+                  <PostListItemContainer post={posts[item._id]} />
                 )}
               />
             ) : (
@@ -113,11 +106,13 @@ const ProfileScreen = ({ navigation }) => {
           )}
         </View>
       ) : (
-        <Text>Loading</Text>
+        <View style={{ flex: 1, justifyContent: 'center' }}>
+          <ActivityIndicator size="large" />
+        </View>
       )}
     </>
   );
-};
+}
 ProfileScreen.navigationOptions = function({ navigation }) {
   return {
     title: navigation.getParam('title', 'Profile'),
