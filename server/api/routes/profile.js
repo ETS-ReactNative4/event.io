@@ -38,10 +38,9 @@ router.get('/:uid', tokenVerification, async (req, res) => {
     case 'friend': {
       try {
         const friend = await db.User.findById(req.params.uid).select('-email -password');
-        const posts = await db.Post.find({ user: req.params.uid }).populate(
-          'user',
-          '-email -password'
-        );
+        const posts = await db.Post.find({ user: req.params.uid, parent: null })
+          .populate('user', '-email -password')
+          .sort({ createdAt: -1 });
         res.json({
           user: {
             uid: friend.id,

@@ -1,6 +1,11 @@
 import React, { useState, useEffect, useContext } from 'react';
-import { TouchableOpacity, StyleSheet, Text, View, Switch } from 'react-native';
-import Slider from 'react-native-slider';
+import {
+  TouchableOpacity,
+  StyleSheet,
+  Text,
+  View,
+  KeyboardAvoidingView,
+} from 'react-native';
 import BaseMultiLineTextInput from '../components/BaseMultilineTextInput';
 import { AuthContext } from '../context/AuthContext';
 import PostListItemContainer from '../components/PostListItemContainer';
@@ -59,18 +64,20 @@ export default function PostScreen({ navigation }) {
             }}></View>
         </View>
       )}
-      <View style={{ flex: 1, paddingHorizontal: 24 }}>
-        <BaseMultiLineTextInput
-          autoFocus={true}
-          returnKeyType="done"
-          style={styles.bodyContainer}
-          placeholder="Enter text here."
-          onChangeText={text => setBody(text)}
-        />
-        <TouchableOpacity onPress={onSubmit} style={styles.button}>
-          <Text style={styles.buttonLabel}>Share</Text>
-        </TouchableOpacity>
-      </View>
+      <KeyboardAvoidingView behavior="padding" style={{ flex: 1 }}>
+        <View style={{ paddingHorizontal: 24, flex: 1 }}>
+          <BaseMultiLineTextInput
+            autoFocus={true}
+            returnKeyType="done"
+            style={styles.bodyContainer}
+            placeholder="Enter text here."
+            onChangeText={text => setBody(text)}
+          />
+          <TouchableOpacity onPress={onSubmit} style={styles.button}>
+            <Text style={styles.buttonLabel}>Post</Text>
+          </TouchableOpacity>
+        </View>
+      </KeyboardAvoidingView>
     </View>
   );
 }
@@ -78,14 +85,14 @@ export default function PostScreen({ navigation }) {
 const styles = StyleSheet.create({
   button: {
     padding: 12,
-    marginTop: 16,
+    marginBottom: 100,
     marginLeft: 'auto',
     borderRadius: 6,
-    backgroundColor: '#0275d8',
+    backgroundColor: 'lightgray',
   },
   buttonLabel: {
     fontSize: 16,
-    color: 'white',
+    color: '#333',
   },
   background: {},
   expiryLabel: {
