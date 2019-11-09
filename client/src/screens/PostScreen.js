@@ -10,6 +10,7 @@ import BaseMultiLineTextInput from '../components/BaseMultilineTextInput';
 import { AuthContext } from '../context/AuthContext';
 import PostListItemContainer from '../components/PostListItemContainer';
 import { PostContext } from '../context/PostContext';
+import Geolocation from '@react-native-community/geolocation';
 
 PostScreen.navigationOptions = {
   title: 'Post',
@@ -20,33 +21,40 @@ export default function PostScreen({ navigation }) {
   const { setPost, fetchFeed, fetchProfile } = useContext(PostContext);
   const [body, setBody] = useState('');
 
-  const onSubmit = async () => {
-    if (!body) return console.log('must provide title and body');
-    const post = navigation.getParam('post', null);
-    const url = post ? `/posts/${post._id}` : '/posts';
-    const res = await authCtx.get(url, {
-      method: 'post',
-      headers: {
-        'content-type': 'application/json',
-      },
-      body: JSON.stringify({
-        body,
-        public: true,
-      }),
-    });
-    if (res.ok) {
-      try {
-        const data = await res.json();
-        setPost(data._id, data);
-        if (!post) {
-          fetchFeed();
-          fetchProfile(authCtx.user.uid);
+  const onSubmit = () => {
+    Geolocation.getCurrentPosition(async position => {
+      if (!body) return console.log('must provide title and body');
+      const post = navigation.getParam('post', null);
+      const url = post ? `/posts/${post._id}` : '/posts';
+      const res = await authCtx.get(url, {
+        method: 'post',
+        headers: {
+          'content-type': 'application/json',
+        },
+        body: JSON.stringify({
+          body,
+          public: true,
+          location: {
+            latitude: position.coords.latitude + (Math.random() - 0.5) * 0.005,
+            longitude:
+              position.coords.longitude + (Math.random() - 0.5) * 0.005,
+          },
+        }),
+      });
+      if (res.ok) {
+        try {
+          const data = await res.json();
+          setPost(data._id, data);
+          if (!post) {
+            fetchFeed();
+            fetchProfile(authCtx.user.uid);
+          }
+          navigation.goBack();
+        } catch (err) {
+          console.log(err);
         }
-        navigation.goBack();
-      } catch (err) {
-        console.log(err);
-      }
-    } else [console.log('Error: Server resoonded with status', res.status)];
+      } else [console.log('Error: Server resoonded with status', res.status)];
+    });
   };
 
   return (

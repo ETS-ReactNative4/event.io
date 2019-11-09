@@ -51,6 +51,7 @@ const SettingsStack = createStackNavigator({
 
 const BottomNavigator = createBottomTabNavigator(
   {
+    Notifications: SettingsStack,
     Explore: ExploreStack,
     Feed: FeedStack,
     Profile: ProfileStack,
@@ -73,6 +74,9 @@ const BottomNavigator = createBottomTabNavigator(
           }
           case 'Profile': {
             return <ProfileIcon style={style} />;
+          }
+          case 'Notifications': {
+            return <Icon style={style} name="notifications" />;
           }
         }
       },

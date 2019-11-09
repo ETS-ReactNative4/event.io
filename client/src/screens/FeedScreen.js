@@ -4,11 +4,23 @@ import { FlatList } from 'react-navigation';
 import PostListItemContainer from '../components/PostListItemContainer';
 import SearchScreen from '../screens/SearchScreen';
 import { PostContext } from '../context/PostContext';
-import { AuthContext } from '../context/AuthContext';
 
 function FeedScreen({ navigation }) {
   const { fetchFeed, feed, posts } = useContext(PostContext);
-  const { user } = useContext(AuthContext);
+  const REFRESH_RATE = 60 * 1000;
+
+  useEffect(() => {
+    let interval;
+    setTimeout(() => {
+      interval = setInterval(() => {
+        fetchFeed();
+      }, REFRESH_RATE);
+    }, REFRESH_RATE);
+    fetchFeed();
+    return () => {
+      clearInterval(interval);
+    };
+  }, []);
 
   return (
     <View style={{ flex: 1 }}>

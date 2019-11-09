@@ -1,33 +1,26 @@
-import React from 'react';
+import React, { useState, useContext, useEffect } from 'react';
 import { View, Text, StyleSheet } from 'react-native';
-import MapView, { Marker, Callout } from 'react-native-maps';
+import MapView, { Marker, Callout, Circle } from 'react-native-maps';
 import Icon from '../components/Icon';
 import Geolocation from '@react-native-community/geolocation';
-import { AuthContext } from '../context/AuthContext';
+import { PostContext } from '../context/PostContext';
 
-export default class Home extends React.Component {
-  static navigationOptions = {
-    title: 'Explore',
-  };
+ExploreScreen.navigationOptions = {
+  title: 'Explore',
+};
+export default function ExploreScreen({ navigation }) {
+  const { feed } = useContext(PostContext);
+  const [position, setPosition] = useState({
+    longitude: -122,
+    latitude: 32,
+  });
 
-  static contextType = AuthContext;
-
-  state = {
-    posts: [],
-    position: {
-      longitude: -122,
-      latitude: 32,
-    },
-  };
-
-  componentDidMount = async () => {
+  useEffect(() => {
     Geolocation.getCurrentPosition(
       pos => {
-        this.setState({
-          position: {
-            latitude: pos.coords.latitude,
-            longitude: pos.coords.longitude,
-          },
+        setPosition({
+          latitude: pos.coords.latitude,
+          longitude: pos.coords.longitude,
         });
       },
       err => console.error(err),
@@ -35,61 +28,67 @@ export default class Home extends React.Component {
         enableHighAccuracy: true,
       },
     );
-  };
+    return () => {};
+  }, []);
 
-  center = () => {
-    this.map.animateToRegion(this.state.position, 500);
-  };
+  function center() {
+    map.animateToRegion(position, 500);
+  }
 
-  render() {
-    const { position } = this.state;
-    return (
-      <View style={{ flex: 1 }}>
-        <MapView
-          ref={map => (this.map = map)}
-          style={{ height: '100%', width: '100%', flex: 1 }}
-          region={{
-            latitude: position.latitude,
-            longitude: position.longitude,
-            latitudeDelta: 0.00522,
-            longitudeDelta: 0.00521,
-          }}
-          showsUserLocation={true}
-          showsBuildings={false}
-          pitchEnabled={false}
-          userLocationAnnotationTitle="Me">
-          {this.state.posts.map(post => {
+  return (
+    <View style={{ flex: 1 }}>
+      <MapView
+        ref={map => (this.map = map)}
+        style={{ height: '100%', width: '100%', flex: 1 }}
+        region={{
+          latitude: position.latitude,
+          longitude: position.longitude,
+          latitudeDelta: 0.0522,
+          longitudeDelta: 0.0521,
+        }}
+        showsUserLocation={true}
+        showsBuildings={false}
+        pitchEnabled={false}>
+        <Circle
+          radius={1000}
+          center={position}
+          strokeColor={'white'}
+          fillColor={'rgba(200,200,248,0.5)'}
+        />
+        {feed &&
+          feed.map(post => {
             return (
               <Marker
-                key={post.id}
-                coordinate={post.pos}
+                key={post._id}
+                coordinate={post.location}
                 pinColor="darkseagreen">
                 <Callout
                   tooltip={true}
                   onPress={() =>
-                    this.props.navigation.navigate('NoteDetails', {
+                    navigation.navigate('NoteDetails', {
                       post,
                     })
                   }>
-                  <Text style={styles.callout}>{post.title}</Text>
+                  <Text style={styles.callout}>
+                    {post.user.username} - {post.body}
+                  </Text>
                 </Callout>
               </Marker>
             );
           })}
-          <Icon
-            style={styles.icon}
-            onPress={() => this.props.navigation.navigate('Post')}
-            name="add-circle"
-          />
-          <Icon
-            style={[styles.icon, { bottom: 0 }]}
-            onPress={this.center}
-            name="locate"
-          />
-        </MapView>
-      </View>
-    );
-  }
+        <Icon
+          style={styles.icon}
+          onPress={() => navigation.navigate('Post')}
+          name="add-circle"
+        />
+        <Icon
+          style={[styles.icon, { bottom: 0 }]}
+          onPress={center}
+          name="locate"
+        />
+      </MapView>
+    </View>
+  );
 }
 
 const styles = StyleSheet.create({

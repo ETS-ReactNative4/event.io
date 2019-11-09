@@ -62,6 +62,7 @@ class LoginScreen extends Component {
             justifyContent: 'center',
             flex: 1,
           }}>
+          <Text>Bring life to your events.</Text>
           <FadeIn>
             <View style={{ marginLeft: '12.5%', width: '75%' }}>
               <Text style={{ color: 'white', fontSize: 32, marginBottom: 32 }}>

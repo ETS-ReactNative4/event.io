@@ -1,4 +1,4 @@
-const mongoose = require('mongoose');
+const mongoose = require('mongoose')
 
 const PostSchema = new mongoose.Schema({
   parent: {
@@ -13,6 +13,10 @@ const PostSchema = new mongoose.Schema({
     ref: 'User',
     required: true
   },
+  location: {
+    latitude: Number,
+    longitude: Number
+  },
   public: {
     type: Boolean,
     default: false,
@@ -26,6 +30,6 @@ const PostSchema = new mongoose.Schema({
     type: Date,
     default: Date.now
   }
-});
+})
 
-module.exports = mongoose.model('Post', PostSchema);
+module.exports = mongoose.model('Post', PostSchema)
