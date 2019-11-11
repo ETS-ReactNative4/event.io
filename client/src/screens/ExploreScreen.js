@@ -9,9 +9,9 @@ ExploreScreen.navigationOptions = {
   title: 'Explore',
 };
 export default function ExploreScreen({ navigation }) {
-  const { feed } = useContext(PostContext);
+  const { feeds } = useContext(PostContext);
   const [position, setPosition] = useState({
-    longitude: -122,
+    longitude: -43.666667,
     latitude: 32,
   });
 
@@ -55,32 +55,25 @@ export default function ExploreScreen({ navigation }) {
           strokeColor={'white'}
           fillColor={'rgba(200,200,248,0.5)'}
         />
-        {feed &&
-          feed.map(post => {
+        {feeds &&
+          feeds.map(feed => {
             return (
               <Marker
-                key={post._id}
-                coordinate={post.location}
+                key={feed._id}
+                coordinate={feed.location}
                 pinColor="darkseagreen">
                 <Callout
                   tooltip={true}
                   onPress={() =>
                     navigation.navigate('NoteDetails', {
-                      post,
+                      post: feed,
                     })
                   }>
-                  <Text style={styles.callout}>
-                    {post.user.username} - {post.body}
-                  </Text>
+                  <Text style={styles.callout}>{feed.title}</Text>
                 </Callout>
               </Marker>
             );
           })}
-        <Icon
-          style={styles.icon}
-          onPress={() => navigation.navigate('Post')}
-          name="add-circle"
-        />
         <Icon
           style={[styles.icon, { bottom: 0 }]}
           onPress={center}

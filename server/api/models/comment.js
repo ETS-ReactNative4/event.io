@@ -1,29 +1,25 @@
 const mongoose = require('mongoose');
 
 const CommentSchema = new mongoose.Schema({
-  user: {
-    type: mongoose.SchemaTypes.ObjectId,
-    ref: 'User',
-    required: true
-  },
   parent: {
     type: mongoose.SchemaTypes.ObjectId,
     ref: 'Comment',
     default: null
   },
-  replies: [
-    {
-      type: mongoose.SchemaTypes.ObjectId,
-      ref: 'Comment'
-    }
-  ],
+  replies: [{ type: mongoose.SchemaTypes.ObjectId, ref: 'Comment', default: [] }],
+  likes: [{ type: mongoose.SchemaTypes.ObjectId, ref: 'User', default: [] }],
+  user: {
+    type: mongoose.SchemaTypes.ObjectId,
+    ref: 'User',
+    required: true
+  },
   body: {
     type: String,
     required: true
   },
-  likes: {
-    type: mongoose.SchemaTypes.ObjectId,
-    ref: 'User'
+  createdAt: {
+    type: Date,
+    default: Date.now
   }
 });
 

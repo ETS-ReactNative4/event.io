@@ -1,7 +1,7 @@
 module.exports = {
-  Post: require('./post'),
   User: require('./user'),
-  FriendRequest: require('./friendRequest'),
-  Friends: require('./friends'),
-  Comment: require('./comment')
+  Feed: require('./feed'),
+  Post: require('./post'),
+  Comment: require('./comment'),
+  FriendRequest: require('./friendRequest')
 };

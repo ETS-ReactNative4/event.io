@@ -1,19 +1,115 @@
 import React, { useState, useContext, useEffect, useReducer } from 'react';
 import { AuthContext } from './AuthContext';
-export const PostContext = React.createContext();
+import Geolocation from '@react-native-community/geolocation';
 
+export const PostContext = React.createContext();
 export const PostProvider = props => {
+  const [feeds, setFeeds] = useState([]);
   const [posts, setPosts] = useState({});
-  const [feed, setFeed] = useState([]);
   const [profiles, setProfiles] = useState({});
   const auth = useContext(AuthContext);
 
   useEffect(() => {
     if (auth.user) {
-      fetchFeed();
+      fetchFeeds();
       fetchProfile(auth.user.uid);
     }
   }, [auth.user]);
+
+  async function createComment(postId, comment) {
+    try {
+      const res = await auth.get('/feed/');
+    } catch (err) {
+      console.log(err);
+      return null;
+    }
+  }
+
+  async function createPost(feedId, post) {
+    try {
+      const res = await auth.get(`/feed/${feedId}`, {
+        method: 'post',
+        headers: {
+          'content-type': 'application/json',
+        },
+        body: JSON.stringify(post),
+      });
+      if (res.ok) {
+        // return supdated feed
+        const data = await res.json();
+        return data;
+      } else {
+        console.log('Error creating post.', res);
+        return null;
+      }
+    } catch (err) {
+      console.log(err);
+      return null;
+    }
+  }
+
+  async function createFeed(feed) {
+    try {
+      Geolocation.getCurrentPosition(
+        async pos => {
+          const { audience, title, description } = feed;
+          const location = {
+            latitude: pos.coords.latitude + (Math.random() - 0.5) * 0.005,
+            longitude: pos.coords.longitude + (Math.random() - 0.5) * 0.005,
+          };
+          const res = await auth.get('/feed', {
+            method: 'post',
+            headers: {
+              'Content-Type': 'application/json',
+            },
+            body: JSON.stringify({ title, description, audience, location }),
+          });
+          if (res.ok) {
+            const createdFeed = await res.json();
+            const updatedFeeds = [...feeds];
+            updatedFeeds.push(createdFeed);
+            setFeeds(updatedFeeds);
+            return createdFeed;
+          } else {
+            console.log(
+              'Error creating feed. Server responded with status code',
+              res,
+            );
+            return null;
+          }
+        },
+        err => {
+          console.log('Geolocation error in createFeed', err);
+          return null;
+        },
+      );
+    } catch (err) {
+      console.log('Error::PostContext::createFeed', err);
+      return null;
+    }
+  }
+  // whole data set.
+  async function fetchFeeds() {
+    try {
+      const res = await auth.get('/feed');
+      if (res.ok) {
+        const data = await res.json();
+        setFeeds(data);
+        //cacheFeeds(data);
+        return data;
+      }
+    } catch (err) {
+      console.log('Error::PostContext::fetchFeed', err);
+      return null;
+    }
+  }
+  function cacheFeeds(feeds) {
+    const out = {};
+    for (let feed of feeds) {
+      out[feed._id] = feed;
+    }
+    setFeeds(out);
+  }
 
   async function getProfile(id) {
     try {
@@ -75,21 +171,6 @@ export const PostProvider = props => {
     }
   }
 
-  async function fetchFeed() {
-    try {
-      const res = await auth.get('/feed');
-      const data = await res.json();
-      for (let post of data) {
-        setPost(post._id, post);
-      }
-      setFeed(data);
-      return data;
-    } catch (err) {
-      console.log('Error::PostContext::fetchFeed', err);
-      return null;
-    }
-  }
-
   async function fetchPost(id) {
     try {
       const res = await auth.get(`/posts/${id}`);
@@ -141,15 +222,16 @@ export const PostProvider = props => {
   return (
     <PostContext.Provider
       value={{
+        feeds,
+        fetchFeeds,
+        createFeed,
+        createPost,
         posts,
         getPost,
         getPostChildren,
         setPosts: setPosts.bind(this),
         setPost,
-        feed,
-        fetchFeed,
         fetchProfile,
-        setFeed: setFeed.bind(this),
         getProfile,
         profiles,
         setProfiles,

@@ -1,49 +1,65 @@
-import React, { useContext, useEffect } from 'react';
-import { Text, View, ActivityIndicator } from 'react-native';
+import React, { useContext, useEffect, useState } from 'react';
+import { TouchableOpacity, Text, View, RefreshControl } from 'react-native';
 import { FlatList } from 'react-navigation';
-import PostListItemContainer from '../components/PostListItemContainer';
 import SearchScreen from '../screens/SearchScreen';
 import { PostContext } from '../context/PostContext';
+import Icon from '../components/Icon';
+import FeedItem from '../components/FeedItem';
 
 function FeedScreen({ navigation }) {
-  const { fetchFeed, feed, posts } = useContext(PostContext);
+  const { fetchFeeds, feeds, posts } = useContext(PostContext);
+  const [refreshing, setRefreshing] = useState(false);
   const REFRESH_RATE = 60 * 1000;
 
   useEffect(() => {
     let interval;
     setTimeout(() => {
       interval = setInterval(() => {
-        fetchFeed();
+        fetchFeeds();
       }, REFRESH_RATE);
     }, REFRESH_RATE);
-    fetchFeed();
     return () => {
       clearInterval(interval);
     };
   }, []);
 
+  async function handleRefresh() {
+    setRefreshing(true);
+    await fetchFeeds();
+    setRefreshing(false);
+  }
+
   return (
     <View style={{ flex: 1 }}>
       <SearchScreen />
-      {feed ? (
+      {feeds.length > 0 ? (
         <FlatList
-          data={feed}
+          data={feeds}
           keyExtractor={item => item._id}
-          renderItem={({ item }) => (
-            <PostListItemContainer post={posts[item._id]} />
-          )}
+          renderItem={({ item }) => <FeedItem feed={item} />}
+          refreshing={refreshing}
+          onRefresh={() => fetchFeeds()}
         />
       ) : (
-        <View style={{ justifyContent: 'center', flex: 1 }}>
-          <ActivityIndicator size="large" />
+        <View
+          style={{ flex: 1, justifyContent: 'center', alignItems: 'center' }}>
+          <Text>No feeds available.</Text>
         </View>
       )}
     </View>
   );
 }
-
-FeedScreen.navigationOptions = {
-  title: 'Feed',
+FeedScreen.navigationOptions = ({ navigation }) => {
+  return {
+    title: 'Feeds',
+    headerRight: (
+      <TouchableOpacity onPress={() => navigation.navigate('CreateFeed')}>
+        <Icon
+          style={{ fontSize: 32, marginRight: 24 }}
+          name="add-circle-outline"
+        />
+      </TouchableOpacity>
+    ),
+  };
 };
-
 export default FeedScreen;

@@ -1,25 +1,11 @@
-const mongoose = require('mongoose')
+const mongoose = require('mongoose');
 
 const PostSchema = new mongoose.Schema({
-  parent: {
-    type: mongoose.SchemaTypes.ObjectId,
-    ref: 'Post',
-    default: null
-  },
-  children: [{ type: mongoose.SchemaTypes.ObjectId, ref: 'Post', default: [] }],
   likes: [{ type: mongoose.SchemaTypes.ObjectId, ref: 'User', default: [] }],
+  comments: [{ type: mongoose.SchemaTypes.ObjectId, ref: 'Comment', default: [] }],
   user: {
     type: mongoose.SchemaTypes.ObjectId,
     ref: 'User',
-    required: true
-  },
-  location: {
-    latitude: Number,
-    longitude: Number
-  },
-  public: {
-    type: Boolean,
-    default: false,
     required: true
   },
   body: {
@@ -30,6 +16,6 @@ const PostSchema = new mongoose.Schema({
     type: Date,
     default: Date.now
   }
-})
+});
 
-module.exports = mongoose.model('Post', PostSchema)
+module.exports = mongoose.model('Post', PostSchema);

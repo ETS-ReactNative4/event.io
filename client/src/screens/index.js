@@ -16,6 +16,8 @@ import FriendRequestsScreen from './FriendRequestsScreen';
 import FriendsScreen from './FriendsScreen';
 import ProfileIcon from '../components/ProfileIcon';
 import CommentsScreen from './CommentsScreen';
+import CreateFeedScreen from './CreateFeedScreen';
+import FeedDetailsScreen from './FeedDetailsScreen';
 
 const AuthNavigator = createStackNavigator({
   Login: {
@@ -30,11 +32,26 @@ const ExploreStack = createStackNavigator({
   Camera: CameraScreen,
 });
 
-const FeedStack = createStackNavigator({
-  Feed: FeedScreen,
-  Post: PostScreen,
-  Profile: ProfileScreen,
-});
+const FeedStack = createStackNavigator(
+  {
+    Feed: FeedScreen,
+    CreateFeed: CreateFeedScreen,
+    FeedDetails: FeedDetailsScreen,
+    Post: PostScreen,
+    Profile: ProfileScreen,
+  },
+  {
+    defaultNavigationOptions: ({ navigation }) => {
+      switch (navigation.state.routeName) {
+        case 'Feed': {
+          return {
+            headerBackTitle: null,
+          };
+        }
+      }
+    },
+  },
+);
 
 const ProfileStack = createStackNavigator({
   Profile: ProfileScreen,
