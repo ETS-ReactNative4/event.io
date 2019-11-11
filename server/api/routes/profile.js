@@ -1,16 +1,16 @@
-const router = require('express').Router();
-const db = require('../models');
-const tokenVerification = require('../middleware/jwtCheck');
+const router = require('express').Router()
+const db = require('../models')
+const tokenVerification = require('../middleware/jwtCheck')
 
 router.get('/:uid', tokenVerification, async (req, res) => {
-  const user = await db.User.findById(req.user.uid);
-  let relationship = null;
+  const user = await db.User.findById(req.user.uid)
+  let relationship = null
   if (req.params.uid === user.id) {
-    relationship = 'self';
+    relationship = 'self'
   } else if (user.friends.includes(req.params.uid)) {
-    relationship = 'friend';
+    relationship = 'friend'
   } else {
-    relationship = 'other';
+    relationship = 'other'
   }
 
   switch (relationship) {
@@ -18,7 +18,7 @@ router.get('/:uid', tokenVerification, async (req, res) => {
       try {
         const posts = await db.Post.find({ user: user.id, parent: null })
           .populate('user', '-email -password')
-          .sort({ createdAt: -1 });
+          .sort({ createdAt: -1 })
         res.json({
           user: {
             uid: user.id,
@@ -28,19 +28,19 @@ router.get('/:uid', tokenVerification, async (req, res) => {
           },
           posts,
           relationship
-        });
+        })
       } catch (err) {
-        console.log(err);
-        res.status(500).end();
+        console.log(err)
+        res.status(500).end()
       }
-      break;
+      break
     }
     case 'friend': {
       try {
-        const friend = await db.User.findById(req.params.uid).select('-email -password');
+        const friend = await db.User.findById(req.params.uid).select('-email -password')
         const posts = await db.Post.find({ user: req.params.uid, parent: null })
           .populate('user', '-email -password')
-          .sort({ createdAt: -1 });
+          .sort({ createdAt: -1 })
         res.json({
           user: {
             uid: friend.id,
@@ -50,16 +50,16 @@ router.get('/:uid', tokenVerification, async (req, res) => {
           },
           posts,
           relationship
-        });
+        })
       } catch (err) {
-        console.log(err);
-        res.status(500).end();
+        console.log(err)
+        res.status(500).end()
       }
-      break;
+      break
     }
     case 'other': {
       try {
-        const other = await db.User.findById(req.params.uid).select('-email -password -friends');
+        const other = await db.User.findById(req.params.uid).select('-email -password -friends')
         res.json({
           user: {
             uid: other.id,
@@ -67,18 +67,18 @@ router.get('/:uid', tokenVerification, async (req, res) => {
             picture: other.picture
           },
           relationship
-        });
+        })
       } catch (err) {
-        console.log(err);
-        res.status(500).end();
+        console.log(err)
+        res.status(500).end()
       }
-      break;
+      break
     }
     default: {
-      console.log('/profile/id Could not resolve user relationship');
-      res.status(500).end();
+      console.log('/profile/id Could not resolve user relationship')
+      res.status(500).end()
     }
   }
-});
+})
 
-module.exports = router;
+module.exports = router

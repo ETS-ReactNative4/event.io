@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useState, useContext } from 'react';
 import {
   TouchableOpacity,
   View,
@@ -10,6 +10,7 @@ import Avatar from '../components/Avatar';
 import PostListItem from '../components/PostListItemContainer';
 import Icon from '../components/Icon';
 import PostListItemContainer from '../components/PostListItemContainer';
+import { PostContext } from '../context/PostContext';
 
 FeedDetailsScreen.navigationOptions = ({ navigation }) => {
   return {
@@ -19,24 +20,29 @@ FeedDetailsScreen.navigationOptions = ({ navigation }) => {
 export default function FeedDetailsScreen({ navigation }) {
   const [showDescription, setShowDescription] = useState(false);
   const feed = navigation.getParam('feed', null);
+  const postCtx = useContext(PostContext);
+  const posts = postCtx.posts[feed._id];
 
   function toggleDescription() {
-    //LayoutAnimation.spring();
     setShowDescription(!showDescription);
   }
 
   useEffect(() => {
-    console.log(feed.posts);
-  }, []);
+    if (feed) {
+      postCtx.getPosts(feed._id);
+    }
+  }, [feed]);
 
   const PostList = () => {
     return (
       <>
-        {feed.posts.length > 0 ? (
+        {posts ? (
           <FlatList
-            data={feed.posts}
+            data={posts}
             keyExtractor={item => item._id}
-            renderItem={({ item }) => <PostListItemContainer post={item} />}
+            renderItem={({ item }) => {
+              <PostListItemContainer post={item} />;
+            }}
           />
         ) : (
           <View
@@ -106,7 +112,7 @@ export default function FeedDetailsScreen({ navigation }) {
             </Text>
           </>
         )}
-        {feed.posts.length > 0 && (
+        {posts && (
           <FlatList
             data={feed.posts}
             keyExtractor={item => item._id}

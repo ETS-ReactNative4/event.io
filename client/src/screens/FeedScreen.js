@@ -38,7 +38,7 @@ function FeedScreen({ navigation }) {
           keyExtractor={item => item._id}
           renderItem={({ item }) => <FeedItem feed={item} />}
           refreshing={refreshing}
-          onRefresh={() => fetchFeeds()}
+          onRefresh={handleRefresh}
         />
       ) : (
         <View

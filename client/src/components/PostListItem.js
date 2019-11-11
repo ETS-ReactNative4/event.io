@@ -11,7 +11,6 @@ import 'moment-timezone';
 import Avatar from '../components/Avatar';
 import PostListItemOptions from './PostListItemOptions';
 import PostListItemContainer from './PostListItemContainer';
-import { PostContext } from '../context/PostContext';
 
 const PostListItem = ({
   post,
@@ -21,11 +20,9 @@ const PostListItem = ({
   showOptions = true,
 }) => {
   const [commentToggle, setCommentToggle] = useState(false);
-  const { posts, getPostChildren } = useContext(PostContext);
 
   async function toggleCommentDisplay() {
-    if (!post.children || post.children.length === 0) return;
-    await getPostChildren(post._id);
+    if (!post.comments || post.comments.length === 0) return;
     LayoutAnimation.configureNext(
       LayoutAnimation.create(
         200,
@@ -96,9 +93,7 @@ const PostListItem = ({
               borderLeftColor: 'lightgray',
             }}>
             {post.children.map(post => {
-              return (
-                <PostListItemContainer showAvatar={false} post={posts[post]} />
-              );
+              return <PostListItemContainer showAvatar={false} post={post} />;
             })}
           </View>
         </View>

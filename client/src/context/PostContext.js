@@ -16,15 +16,6 @@ export const PostProvider = props => {
     }
   }, [auth.user]);
 
-  async function createComment(postId, comment) {
-    try {
-      const res = await auth.get('/feed/');
-    } catch (err) {
-      console.log(err);
-      return null;
-    }
-  }
-
   async function createPost(feedId, post) {
     try {
       const res = await auth.get(`/feed/${feedId}`, {
@@ -88,6 +79,33 @@ export const PostProvider = props => {
       return null;
     }
   }
+
+  async function getPosts(feedId) {
+    if (posts[feedId]) return posts[feedId];
+    else {
+      const data = await fetchPosts(feedId);
+
+      return data;
+    }
+  }
+
+  async function fetchPosts(feedId) {
+    try {
+      const res = await auth.get(`/feed/${feedId}`);
+      if (res.ok) {
+        const data = await res.json();
+        // data = {feed: {}, posts: []}
+        setPosts({ ...posts, [data.feed._id]: data.posts });
+        return data;
+      } else {
+        console.log('Error fetching post from server');
+        return null;
+      }
+    } catch (err) {
+      console.log(err);
+      return null;
+    }
+  }
   // whole data set.
   async function fetchFeeds() {
     try {
@@ -102,13 +120,6 @@ export const PostProvider = props => {
       console.log('Error::PostContext::fetchFeed', err);
       return null;
     }
-  }
-  function cacheFeeds(feeds) {
-    const out = {};
-    for (let feed of feeds) {
-      out[feed._id] = feed;
-    }
-    setFeeds(out);
   }
 
   async function getProfile(id) {
@@ -125,33 +136,6 @@ export const PostProvider = props => {
       }
     } catch (err) {
       console.log('Error::PostContext::getProfile', err);
-      return null;
-    }
-  }
-
-  async function getPostChildren(id) {
-    try {
-      const post = posts[id];
-      if (!post) return null;
-      // we have post with id.
-      let out = [];
-      for (let childId of post.children) {
-        const child = posts[childId];
-        if (child) out.push(child);
-        else {
-          // send request to fetch children
-          const res = await auth.get(`/posts/${id}/children`);
-          const data = await res.json();
-          for (let post of data) {
-            setPost(post._id, post);
-          }
-          out = data;
-          break;
-        }
-      }
-      return out;
-    } catch (err) {
-      console.log(err);
       return null;
     }
   }
@@ -222,20 +206,21 @@ export const PostProvider = props => {
   return (
     <PostContext.Provider
       value={{
+        // feeds
         feeds,
         fetchFeeds,
         createFeed,
-        createPost,
+        // posts
         posts,
-        getPost,
-        getPostChildren,
-        setPosts: setPosts.bind(this),
-        setPost,
+        getPosts,
+        fetchPosts,
+        createPost,
+        setLikePost,
+        // profile
         fetchProfile,
         getProfile,
         profiles,
         setProfiles,
-        setLikePost,
       }}>
       {props.children}
     </PostContext.Provider>
