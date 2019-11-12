@@ -1,41 +1,21 @@
 import React, { useState, useContext } from 'react';
 import { FlatList, View, StyleSheet } from 'react-native';
-import BaseTextInput from '../components/BaseTextInput';
-import Icon from '../components/Icon';
 import { AuthContext } from '../context/AuthContext';
 import { FriendsContext } from '../context/FriendsContext';
-import BaseUserListItem from '../components/BaseUserListItem';
 
-export default function SearchScreen() {
+import BaseTextInput from './BaseTextInput';
+import Icon from './Icon';
+import BaseUserListItem from './BaseUserListItem';
+
+export default function Search() {
   const [searchUsers, setSearchUsers] = useState([]);
   const authContext = useContext(AuthContext);
   const friendsContext = useContext(FriendsContext);
-
-  sendFriendRequest = async id => {
-    console.log('pressed');
-    const res = await authContext.get('/friends/requests', {
-      method: 'post',
-      headers: {
-        'content-type': 'application/json',
-      },
-      body: JSON.stringify({ to: id }),
-    });
-    if (res.ok) {
-      console.log(res.json());
-    }
-  };
 
   getUsers = async text => {
     const res = await authContext.get(`/users?q=${text}`);
     const data = await res.json();
     setSearchUsers(data);
-  };
-
-  isFriend = id => {
-    for (let f of friendsContext.friends) {
-      if (f._id === id) return true;
-    }
-    return false;
   };
 
   return (

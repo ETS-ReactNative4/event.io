@@ -1,65 +1,54 @@
-import React, { useContext, useEffect, useState } from 'react';
-import { TouchableOpacity, Text, View, RefreshControl } from 'react-native';
-import { FlatList } from 'react-navigation';
-import SearchScreen from '../screens/SearchScreen';
-import { PostContext } from '../context/PostContext';
-import Icon from '../components/Icon';
-import FeedItem from '../components/FeedItem';
+import React, { useContext, useEffect, useState } from 'react'
+import { TouchableOpacity, Text, View } from 'react-native'
+import { FlatList } from 'react-navigation'
+import { PostContext } from '../context/PostContext'
+import Search from '../components/Search'
+import FeedList from '../components/FeedList'
+import Icon from '../components/Icon'
+import _ from 'lodash'
 
-function FeedScreen({ navigation }) {
-  const { fetchFeeds, feeds, posts } = useContext(PostContext);
-  const [refreshing, setRefreshing] = useState(false);
-  const REFRESH_RATE = 60 * 1000;
-
-  useEffect(() => {
-    let interval;
-    setTimeout(() => {
-      interval = setInterval(() => {
-        fetchFeeds();
-      }, REFRESH_RATE);
-    }, REFRESH_RATE);
-    return () => {
-      clearInterval(interval);
-    };
-  }, []);
-
-  async function handleRefresh() {
-    setRefreshing(true);
-    await fetchFeeds();
-    setRefreshing(false);
-  }
-
-  return (
-    <View style={{ flex: 1 }}>
-      <SearchScreen />
-      {feeds.length > 0 ? (
-        <FlatList
-          data={feeds}
-          keyExtractor={item => item._id}
-          renderItem={({ item }) => <FeedItem feed={item} />}
-          refreshing={refreshing}
-          onRefresh={handleRefresh}
-        />
-      ) : (
-        <View
-          style={{ flex: 1, justifyContent: 'center', alignItems: 'center' }}>
-          <Text>No feeds available.</Text>
-        </View>
-      )}
-    </View>
-  );
-}
 FeedScreen.navigationOptions = ({ navigation }) => {
   return {
     title: 'Feeds',
     headerRight: (
       <TouchableOpacity onPress={() => navigation.navigate('CreateFeed')}>
-        <Icon
-          style={{ fontSize: 32, marginRight: 24 }}
-          name="add-circle-outline"
-        />
+        <Icon style={{ fontSize: 32, marginRight: 24 }} name='add-circle-outline' />
       </TouchableOpacity>
-    ),
-  };
-};
-export default FeedScreen;
+    )
+  }
+}
+
+function FeedScreen({ navigation }) {
+  const { getFeeds, fetchFeeds, posts } = useContext(PostContext)
+  const [internalFeeds, setInternalFeeds] = useState(null)
+  const [refreshing, setRefreshing] = useState(false)
+  const REFRESH_RATE = 60 * 1000;
+
+  // On mount
+  useEffect(() => {
+    getFeeds().then(feeds => setInternalFeeds(feeds))
+    let interval = setInterval(syncFeeds, REFRESH_RATE)
+    return  () => clearInterval(interval)
+  }, [])
+
+  async function syncFeeds() {
+    const feeds = await fetchFeeds()
+    setInternalFeeds(feeds)
+    return feeds
+  }
+
+  async function handleRefresh() {
+    setRefreshing(true)
+    await syncFeeds()
+    setRefreshing(false)
+  }
+
+  return (
+    <React.Fragment>
+      <Search />
+      <FeedList refreshing={refreshing} onRefresh={handleRefresh} feeds={_.toArray(internalFeeds)}/>
+    </ React.Fragment>
+  )
+}
+
+export default FeedScreen

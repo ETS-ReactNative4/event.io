@@ -10,7 +10,7 @@ const router = require('express').Router();
 const db = require('../models');
 const tokenCheck = require('../middleware/jwtCheck');
 
-// get users post
+// get users posts
 router.get('/', tokenCheck, async (req, res) => {
   try {
     const posts = await db.Post.find({ user: req.user.uid, parent: null }).populate(
@@ -47,10 +47,15 @@ router.post('/', tokenCheck, async (req, res) => {
   }
 });
 
+// get post with comments
 router.get('/:id', tokenCheck, async (req, res) => {
   try {
     const post = await db.Post.findById(req.params.id).populate('user', '-email -password');
-    res.json(post);
+    const comments = await db.Comment.find({ _id: { $in: post.comments } }).populate(
+      'user',
+      '-email -password'
+    );
+    res.json(comments);
   } catch (err) {
     res.status(500).end();
   }
@@ -70,7 +75,8 @@ router.post('/:id', tokenCheck, async (req, res) => {
       { $push: { comments: comment.id } },
       { new: true }
     ).populate('user', '-email -password');
-    res.status(201).json(updatedPost);
+    // return created comment;
+    res.status(201).json(comment);
   } catch (err) {
     console.log(err);
     res.status(500).end();

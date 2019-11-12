@@ -1,16 +1,22 @@
-import React, { useState, useEffect, useContext } from 'react';
-import { ActivityIndicator, View } from 'react-native';
-import PostListItem from './PostListItem';
-import { withNavigation } from 'react-navigation';
-import { PostContext } from '../context/PostContext';
+import React, { useState, useEffect, useContext } from 'react'
+import { ActivityIndicator, View } from 'react-native'
+import PostListItem from './PostListItem'
+import { withNavigation } from 'react-navigation'
+import { PostContext } from '../context/PostContext'
 
 function PostListItemContainer({ post, navigation, showAvatar, showOptions }) {
-  const { setLikePost } = useContext(PostContext);
+  console.log('PostListItemContainer::render')
+
+  const { setLikePost, fetchComments } = useContext(PostContext)
+  const [comments, setComments] = useState()
+
+  useEffect(() => {
+    fetchComments(post._id).then(comments => setComments(comments))
+  }, [])
 
   function onReply() {
-    navigation.push('Post', { post });
+    navigation.push('Post', { post })
   }
-
   return (
     <>
       {post ? (
@@ -18,6 +24,7 @@ function PostListItemContainer({ post, navigation, showAvatar, showOptions }) {
           showOptions={showOptions}
           showAvatar={showAvatar}
           post={post}
+          comments={comments}
           onLike={like => setLikePost(post._id, like)}
           onReply={onReply}
         />
@@ -27,15 +34,11 @@ function PostListItemContainer({ post, navigation, showAvatar, showOptions }) {
         </View>
       )}
     </>
-  );
+  )
 }
-
-export default React.memo(
-  withNavigation(PostListItemContainer),
-  (prevProps, nextProps) => {
-    return (
-      prevProps.post.likes.length === nextProps.post.likes.length &&
-      prevProps.post.children === nextProps.post.children
-    );
-  },
-);
+export default React.memo(withNavigation(PostListItemContainer), (prevProps, nextProps) => {
+  return (
+    prevProps.post.likes.length === nextProps.post.likes.length &&
+    prevProps.post.comments.length === nextProps.post.comments.length
+  )
+})

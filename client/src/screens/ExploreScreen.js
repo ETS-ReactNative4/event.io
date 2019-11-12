@@ -1,38 +1,39 @@
-import React, { useState, useContext, useEffect } from 'react';
-import { View, Text, StyleSheet } from 'react-native';
-import MapView, { Marker, Callout, Circle } from 'react-native-maps';
-import Icon from '../components/Icon';
-import Geolocation from '@react-native-community/geolocation';
-import { PostContext } from '../context/PostContext';
+import React, { useState, useContext, useEffect } from 'react'
+import { View, Text, StyleSheet } from 'react-native'
+import { PostContext } from '../context/PostContext'
+import MapView, { Marker, Callout, Circle } from 'react-native-maps'
+import Icon from '../components/Icon'
+import Geolocation from '@react-native-community/geolocation'
+import _ from 'lodash'
 
 ExploreScreen.navigationOptions = {
-  title: 'Explore',
-};
+  title: 'Explore'
+}
 export default function ExploreScreen({ navigation }) {
-  const { feeds } = useContext(PostContext);
+  const { feeds } = useContext(PostContext)
   const [position, setPosition] = useState({
     longitude: -43.666667,
-    latitude: 32,
-  });
+    latitude: 32
+  })
 
   useEffect(() => {
     Geolocation.getCurrentPosition(
       pos => {
         setPosition({
           latitude: pos.coords.latitude,
-          longitude: pos.coords.longitude,
-        });
+          longitude: pos.coords.longitude
+        })
       },
       err => console.error(err),
       {
-        enableHighAccuracy: true,
-      },
-    );
-    return () => {};
-  }, []);
+        enableHighAccuracy: true
+      }
+    )
+    return () => {}
+  }, [])
 
   function center() {
-    map.animateToRegion(position, 500);
+    map.animateToRegion(position, 500)
   }
 
   return (
@@ -44,11 +45,12 @@ export default function ExploreScreen({ navigation }) {
           latitude: position.latitude,
           longitude: position.longitude,
           latitudeDelta: 0.0522,
-          longitudeDelta: 0.0521,
+          longitudeDelta: 0.0521
         }}
         showsUserLocation={true}
         showsBuildings={false}
-        pitchEnabled={false}>
+        pitchEnabled={false}
+      >
         <Circle
           radius={1000}
           center={position}
@@ -56,32 +58,26 @@ export default function ExploreScreen({ navigation }) {
           fillColor={'rgba(200,200,248,0.5)'}
         />
         {feeds &&
-          feeds.map(feed => {
+          _.toArray(feeds).map(feed => {
             return (
-              <Marker
-                key={feed._id}
-                coordinate={feed.location}
-                pinColor="darkseagreen">
+              <Marker key={feed._id} coordinate={feed.location} pinColor='darkseagreen'>
                 <Callout
                   tooltip={true}
                   onPress={() =>
                     navigation.navigate('NoteDetails', {
-                      post: feed,
+                      post: feed
                     })
-                  }>
+                  }
+                >
                   <Text style={styles.callout}>{feed.title}</Text>
                 </Callout>
               </Marker>
-            );
+            )
           })}
-        <Icon
-          style={[styles.icon, { bottom: 0 }]}
-          onPress={center}
-          name="locate"
-        />
+        <Icon style={[styles.icon, { bottom: 0 }]} onPress={center} name='locate' />
       </MapView>
     </View>
-  );
+  )
 }
 
 const styles = StyleSheet.create({
@@ -89,7 +85,7 @@ const styles = StyleSheet.create({
     backgroundColor: 'white',
     paddingVertical: 10,
     paddingHorizontal: 10,
-    justifyContent: 'center',
+    justifyContent: 'center'
   },
   icon: {
     zIndex: 2,
@@ -97,6 +93,6 @@ const styles = StyleSheet.create({
     left: 12,
     fontSize: 48,
     bottom: 64,
-    color: '#0275d8',
-  },
-});
+    color: '#0275d8'
+  }
+})
