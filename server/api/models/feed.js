@@ -1,4 +1,4 @@
-const mongoose = require('mongoose');
+const mongoose = require('mongoose')
 
 const FeedSchema = new mongoose.Schema({
   user: {
@@ -6,6 +6,7 @@ const FeedSchema = new mongoose.Schema({
     ref: 'User',
     required: true
   },
+  subscribers: [{ type: mongoose.SchemaTypes.ObjectId, ref: 'User', default: [] }],
   posts: [{ type: mongoose.SchemaTypes.ObjectId, ref: 'Post', default: [] }],
   location: {
     latitude: Number,
@@ -37,6 +38,6 @@ const FeedSchema = new mongoose.Schema({
     type: Date,
     default: Date.now
   }
-});
+})
 
-module.exports = mongoose.model('Feed', FeedSchema);
+module.exports = mongoose.model('Feed', FeedSchema)

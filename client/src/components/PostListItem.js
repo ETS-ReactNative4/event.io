@@ -6,6 +6,7 @@ import PostListItemContainer from './PostListItemContainer'
 import { AuthContext } from '../context/AuthContext'
 import PostHeader from './PostHeader'
 import BasePost from './BasePost'
+
 const PostListItem = ({ post, comments, onLike, onReply }) => {
   const [commentToggle, setCommentToggle] = useState(false)
   const auth = useContext(AuthContext)
@@ -28,7 +29,7 @@ const PostListItem = ({ post, comments, onLike, onReply }) => {
     setCommentToggle(!commentToggle)
   }
   const content = (
-    <>
+    <React.Fragment>
       <View
         style={[
           styles.container,
@@ -62,9 +63,9 @@ const PostListItem = ({ post, comments, onLike, onReply }) => {
           </View>
         </View>
       )}
-    </>
+    </React.Fragment>
   )
-  return <>{post ? content : <ActivityIndicator />}</>
+  return <React.Fragment>{post ? content : <ActivityIndicator />}</React.Fragment>
 }
 export default PostListItem
 

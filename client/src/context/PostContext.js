@@ -6,19 +6,16 @@ import _ from 'lodash'
 export const PostContext = React.createContext()
 
 export const PostProvider = props => {
-
   // state
   const [feeds, setFeeds] = useState(null)
   const [posts, setPosts] = useState(null)
-  const [comments, setComments] = useState(null)
-  const [profiles, setProfiles] = useState(null)
+  const [comments, setComments] = useState({})
+  const [profiles, setProfiles] = useState({})
 
   // context
   const auth = useContext(AuthContext)
 
   // Comments
-  async function fetchReplies(commentId) {}
-  async function createReply(commentId, reply) {}
   async function getComments(postId) {
     const post = posts[postId]
     if (post && post.comments) {
@@ -31,7 +28,7 @@ export const PostProvider = props => {
           return await fetchComments(postId)
         }
       }
-      return out;
+      return out
     } else {
       return await fetchComments(postId)
     }
@@ -46,7 +43,7 @@ export const PostProvider = props => {
         for (let comment of data) {
           cache[comment._id] = comment
         }
-        setComments({...comments, ...cache})
+        setComments({ ...comments, ...cache })
         return data
       }
     } catch (err) {
@@ -154,7 +151,12 @@ export const PostProvider = props => {
         for (let post of data.posts) {
           newPosts[post._id] = post
         }
-        setPosts({ ...posts, ...newPosts })
+        // check for null
+        if (posts) {
+          setPosts({ ...posts, ...newPosts })
+        } else {
+          setPosts({ ...newPosts })
+        }
         return data
       } else {
         console.log('Error::PostContext::fetchPosts\nError fetching post from server')
@@ -168,8 +170,30 @@ export const PostProvider = props => {
 
   // returns all posts from a feed.
   async function getPosts(feedId) {
-    const data = await fetchPosts(feedId)
-    return data ? data : null
+    async function defaultToFetch() {
+      console.log('PostContext:getPosts:defaulting to fetch')
+      const fetchedData = await fetchPosts(feedId)
+      return fetchedData
+    }
+    const feed = feeds[feedId]
+    if (!feed) {
+      console.log('Error:PostContext:getPosts: attempting to access posts from non existant feed')
+      return null
+    } else {
+      const feedPosts = []
+      for (postId of feed.posts) {
+        if (!posts) {
+          return await defaultToFetch()
+        }
+        const post = posts[postId]
+        if (!post) {
+          return await defaultToFetch()
+        } else {
+          feedPosts.push(post)
+        }
+      }
+      return { feed, posts: feedPosts }
+    }
   }
 
   async function createPost(feedId, post) {
@@ -184,6 +208,9 @@ export const PostProvider = props => {
       if (res.ok) {
         // return supdated feed
         const data = await res.json()
+        setFeeds({ ...feeds, [data.feed._id]: data.feed })
+        setPosts({ ...posts, [data.post._id]: data.post })
+        console.log(data)
         return data
       } else {
         console.log('Error creating post.', res)

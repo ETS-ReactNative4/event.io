@@ -4,15 +4,11 @@ import PostListItem from './PostListItem'
 import { withNavigation } from 'react-navigation'
 import { PostContext } from '../context/PostContext'
 
-function PostListItemContainer({ post, navigation, showAvatar, showOptions }) {
+export default function PostListItemContainer({ id, navigation, showAvatar, showOptions }) {
   console.log('PostListItemContainer::render')
-
-  const { setLikePost, fetchComments } = useContext(PostContext)
+  const { posts, setLikePost, fetchComments } = useContext(PostContext)
   const [comments, setComments] = useState()
-
-  useEffect(() => {
-    fetchComments(post._id).then(comments => setComments(comments))
-  }, [])
+  const post = posts ? posts[id] : null
 
   function onReply() {
     navigation.push('Post', { post })
@@ -30,15 +26,9 @@ function PostListItemContainer({ post, navigation, showAvatar, showOptions }) {
         />
       ) : (
         <View style={{ padding: 12, justifyContent: 'center' }}>
-          <ActivityIndicator />
+          <ActivityIndicator size='large' />
         </View>
       )}
     </>
   )
 }
-export default React.memo(withNavigation(PostListItemContainer), (prevProps, nextProps) => {
-  return (
-    prevProps.post.likes.length === nextProps.post.likes.length &&
-    prevProps.post.comments.length === nextProps.post.comments.length
-  )
-})

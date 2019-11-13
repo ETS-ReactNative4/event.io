@@ -20,15 +20,15 @@ FeedScreen.navigationOptions = ({ navigation }) => {
 
 function FeedScreen({ navigation }) {
   const { getFeeds, fetchFeeds, posts } = useContext(PostContext)
-  const [internalFeeds, setInternalFeeds] = useState(null)
+  const [internalFeeds, setInternalFeeds] = useState([])
   const [refreshing, setRefreshing] = useState(false)
-  const REFRESH_RATE = 60 * 1000;
+  const REFRESH_RATE = 60 * 1000
 
   // On mount
   useEffect(() => {
     getFeeds().then(feeds => setInternalFeeds(feeds))
     let interval = setInterval(syncFeeds, REFRESH_RATE)
-    return  () => clearInterval(interval)
+    return () => clearInterval(interval)
   }, [])
 
   async function syncFeeds() {
@@ -46,8 +46,12 @@ function FeedScreen({ navigation }) {
   return (
     <React.Fragment>
       <Search />
-      <FeedList refreshing={refreshing} onRefresh={handleRefresh} feeds={_.toArray(internalFeeds)}/>
-    </ React.Fragment>
+      <FeedList
+        refreshing={refreshing}
+        onRefresh={handleRefresh}
+        feeds={_.toArray(internalFeeds)}
+      />
+    </React.Fragment>
   )
 }
 

@@ -4,7 +4,7 @@ import { createStackNavigator } from 'react-navigation-stack'
 import { createBottomTabNavigator } from 'react-navigation-tabs'
 import Icon from '../components/Icon'
 import ExploreScreen from './ExploreScreen'
-import PostScreen from './PostScreen'
+import CreatePostScreen from './CreatePostScreen'
 import CameraScreen from './CameraScreeen'
 import PostDetailsScreen from './PostDetailsScreen'
 import LoginScreen from './LoginScreen'
@@ -32,7 +32,7 @@ const AuthNavigator = createStackNavigator({
 const ExploreStack = createStackNavigator({
   Explore: ExploreScreen,
   PostDetails: PostDetailsScreen,
-  Post: PostScreen,
+  Post: CreatePostScreen,
   Camera: CameraScreen
 })
 
@@ -41,7 +41,7 @@ const FeedStack = createStackNavigator(
     Feed: FeedScreen,
     CreateFeed: CreateFeedScreen,
     FeedDetails: FeedDetailsScreen,
-    Post: PostScreen,
+    Post: CreatePostScreen,
     Profile: ProfileScreen
   },
   {
@@ -63,7 +63,7 @@ const ProfileStack = createStackNavigator({
   FriendRequests: FriendRequestsScreen,
   Friends: FriendsScreen,
   PostDetails: PostDetailsScreen,
-  Post: PostScreen,
+  Post: CreatePostScreen,
   Comments: CommentsScreen
 })
 

@@ -1,45 +1,30 @@
-import React, { useState, useEffect, useContext } from 'react'
+import React, { useState, useContext } from 'react'
 import { TouchableOpacity, StyleSheet, Text, View, Alert, KeyboardAvoidingView } from 'react-native'
 import BaseMultiLineTextInput from '../components/BaseMultilineTextInput'
-import PostListItemContainer from '../components/PostListItemContainer'
 import { PostContext } from '../context/PostContext'
+import FeedInfo from '../components/FeedInfo'
 
-PostScreen.navigationOptions = {
-  title: 'Post'
+CreatePostScreen.navigationOptions = {
+  title: 'Create Post'
 }
-export default function PostScreen({ navigation }) {
-  const { fetchFeeds, createPost, createComment } = useContext(PostContext)
+export default function CreatePostScreen({ navigation }) {
+  const { createPost, createComment } = useContext(PostContext)
   const [body, setBody] = useState('')
+  const feed = navigation.getParam('feed', null)
 
   const onSubmit = () => {
     if (!body) return Alert.alert('Posts cannot be empty')
-    const feed = navigation.getParam('feed', null)
-    const post = navigation.getParam('post', null)
-
     if (feed) {
       createPost(feed._id, { body })
-      navigation.goBack()
-    } else if (post) {
-      createComment(post._id, { body })
       navigation.goBack()
     }
   }
 
   return (
     <View style={{ flex: 1 }}>
-      {navigation.getParam('post', null) && (
-        <View>
-          <PostListItemContainer post={navigation.getParam('post')} showOptions={false} />
-          <View
-            style={{
-              borderBottomWidth: 1,
-              borderBottomColor: 'lightgray'
-            }}
-          ></View>
-        </View>
-      )}
+      <FeedInfo feed={feed} />
       <KeyboardAvoidingView behavior='padding' style={{ flex: 1 }}>
-        <View style={{ paddingHorizontal: 24, flex: 1 }}>
+        <View style={{ padding: 24, flex: 1 }}>
           <BaseMultiLineTextInput
             autoFocus={true}
             returnKeyType='done'
