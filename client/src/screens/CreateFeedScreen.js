@@ -1,29 +1,29 @@
-import React, { useState, useContext } from 'react';
+import React, { useState, useContext } from 'react'
 import {
   StyleSheet,
   View,
   Switch,
   Text,
   KeyboardAvoidingView,
-  TouchableOpacity,
-} from 'react-native';
-import BaseMultiLineTextInput from '../components/BaseMultilineTextInput';
-import BaseTextInput from '../components/BaseTextInput';
-import { PostContext } from '../context/PostContext';
-import Geolocation from '@react-native-community/geolocation';
+  TouchableOpacity
+} from 'react-native'
+import BaseMultiLineTextInput from '../components/BaseMultilineTextInput'
+import BaseTextInput from '../components/BaseTextInput'
+import { PostContext } from '../context/PostContext'
+import Geolocation from '@react-native-community/geolocation'
 
 CreateFeedScreen.navigationOptions = {
-  title: 'Create Feed',
-};
+  title: 'Create Feed'
+}
 export default function CreateFeedScreen({ navigation }) {
-  const postCtx = useContext(PostContext);
-  const [title, setTitle] = useState('');
-  const [description, setDescription] = useState('');
-  const [isPublic, setPublic] = useState(false);
+  const postCtx = useContext(PostContext)
+  const [title, setTitle] = useState('')
+  const [description, setDescription] = useState('')
+  const [isPublic, setPublic] = useState(false)
 
   function onSubmit() {
     Geolocation.getCurrentPosition(position => {
-      const audience = isPublic ? 'public' : 'friends';
+      const audience = isPublic ? 'public' : 'friends'
       postCtx
         .createFeed({
           title,
@@ -31,13 +31,13 @@ export default function CreateFeedScreen({ navigation }) {
           audience,
           location: {
             latitude: position.coords.latitude,
-            longitude: position.coords.longitude,
-          },
+            longitude: position.coords.longitude
+          }
         })
         .then(result => {
-          navigation.goBack();
-        });
-    });
+          navigation.goBack()
+        })
+    })
   }
 
   return (
@@ -51,11 +51,12 @@ export default function CreateFeedScreen({ navigation }) {
           <View
             style={{
               borderBottomWidth: 1,
-              borderBottomColor: 'lightgray',
-            }}></View>
+              borderBottomColor: 'lightgray'
+            }}
+          ></View>
         </View>
       )}
-      <KeyboardAvoidingView behavior="padding" style={{ flex: 1 }}>
+      <KeyboardAvoidingView behavior='padding' style={{ flex: 1 }}>
         <View style={{ paddingHorizontal: 24, flex: 1 }}>
           <View style={{ flex: 1, marginTop: 24 }}>
             <BaseTextInput
@@ -64,15 +65,15 @@ export default function CreateFeedScreen({ navigation }) {
                 fontSize: 16,
                 paddingVertical: 12,
                 borderBottomWidth: 1,
-                borderBottomColor: 'gray',
+                borderBottomColor: 'gray'
               }}
               onChangeText={text => setTitle(text)}
-              placeholder="Title"
+              placeholder='Title'
             />
             <BaseMultiLineTextInput
-              returnKeyType="done"
+              returnKeyType='done'
               style={{ fontSize: 16, flex: 1, paddingVertical: 12 }}
-              placeholder="Description"
+              placeholder='Description'
               onChangeText={text => setDescription(text)}
             />
           </View>
@@ -80,21 +81,24 @@ export default function CreateFeedScreen({ navigation }) {
             style={{
               marginBottom: 100,
               flexDirection: 'row',
-              alignItems: 'center',
-            }}>
+              alignItems: 'center'
+            }}
+          >
             <View>
               <View
                 style={{
                   flexDirection: 'row',
                   alignItems: 'center',
-                  paddingVertical: 12,
-                }}>
+                  paddingVertical: 12
+                }}
+              >
                 <Text
                   style={{
                     marginRight: 12,
                     color: '#333',
-                    fontSize: 16,
-                  }}>
+                    fontSize: 16
+                  }}
+                >
                   Public
                 </Text>
                 <Switch
@@ -115,23 +119,23 @@ export default function CreateFeedScreen({ navigation }) {
         </View>
       </KeyboardAvoidingView>
     </View>
-  );
+  )
 }
 const styles = StyleSheet.create({
   button: {
     padding: 12,
     marginLeft: 'auto',
-    borderRadius: 6,
+    borderRadius: 6
     //backgroundColor: 'lightgray',
   },
   buttonLabel: {
     fontSize: 16,
-    color: '#333',
+    color: '#333'
   },
   background: {},
   expiryLabel: {
     fontStyle: 'italic',
-    marginBottom: 24,
+    marginBottom: 24
   },
-  bodyContainer: { flex: 1 },
-});
+  bodyContainer: { flex: 1 }
+})

@@ -4,8 +4,8 @@ import PostOptions from './PostOptions'
 import { View, StyleSheet, Text } from 'react-native'
 
 export default function BasePost({
+  style,
   post,
-  comments,
   onLike,
   onComment,
   onReply,
@@ -13,11 +13,11 @@ export default function BasePost({
   commentToggle
 }) {
   return (
-    <View style={styles.container}>
+    <View style={[styles.container, style]}>
       <PostHeader username={post.user.username} date={post.createdAt} />
       <Text style={styles.body}>{post.body}</Text>
       <PostOptions
-        comments={comments}
+        comments={post.comments}
         post={post}
         onLike={onLike}
         like={likeToggle}

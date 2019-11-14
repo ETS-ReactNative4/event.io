@@ -1,11 +1,12 @@
 const router = require('express').Router()
-const tokenVerification = require('../middleware/jwtCheck')
-const feedVerification = require('../middleware/feedVerification')
 const db = require('../models')
+const tokenCheck = require('../middleware/tokenCheck')
+const feedCheck = require('../middleware/feedCheck')
+const postCheck = require('../middleware/postCheck')
 const mapService = require('../utils/mapService')
 
 // Get Feeds
-router.get('/', tokenVerification, async (req, res) => {
+router.get('/', tokenCheck, async (req, res) => {
   try {
     const user = await db.User.findById(req.user.uid)
     const { friends } = user
@@ -37,11 +38,10 @@ router.get('/', tokenVerification, async (req, res) => {
 })
 
 // Create Feed
-router.post('/', tokenVerification, async (req, res) => {
+router.post('/', tokenCheck, async (req, res) => {
   try {
     const { location, audience, title, description } = req.body
     mapService.geocodeReverse(location, async mapquestData => {
-      console.log(mapquestData)
       const feed = await db.Feed.create({
         user: req.user.uid,
         location,
@@ -63,14 +63,16 @@ router.post('/', tokenVerification, async (req, res) => {
   }
 })
 
-// Get posts
-router.get('/:feedId', tokenVerification, feedVerification, async (req, res) => {
+// Get Feed and Posts
+router.get('/:feedId', tokenCheck, feedCheck, async (req, res) => {
   try {
-    const feed = await db.Feed.findById(req.params.feedId).populate('user', '-email -password')
-    const posts = await db.Post.find({ _id: { $in: feed.posts } }).populate(
+    const feed = await db.Feed.findById(req.params.feedId).populate(
       'user',
       '-email -password'
     )
+    const posts = await db.Post.find({
+      _id: { $in: feed.posts }
+    }).populate('user', '-email -password')
     res.json({ feed, posts })
   } catch (err) {
     console.log(err)
@@ -79,7 +81,7 @@ router.get('/:feedId', tokenVerification, feedVerification, async (req, res) => 
 })
 
 // Post to a feed
-router.post('/:feedId', tokenVerification, feedVerification, async (req, res) => {
+router.post('/:feedId', tokenCheck, feedCheck, async (req, res) => {
   try {
     const { body } = req.body
     const post = await db.Post.create({
@@ -91,52 +93,71 @@ router.post('/:feedId', tokenVerification, feedVerification, async (req, res) =>
       req.params.feedId,
       { $push: { posts: post.id } },
       { new: true }
-    )
+    ).populate('user', '-email -password')
 
-    res.status(201).json({ feed: updatedFeed, post })
+    post.populate('user', '-email -password', (err, doc) => {
+      if (err) throw err
+      res.status(201).json({ feed: updatedFeed, post: doc })
+    })
   } catch (err) {
     res.status(500).end()
   }
 })
 
-// Post a comment to a post in feed
-router.post('/:feedId/:postId', tokenVerification, feedVerification, async (req, res) => {
-  const { body } = req.body
-  try {
-    const comment = await db.Comment.create({
-      body,
-      user: req.user.uid
-    })
-    const post = await db.Post.findByIdAndUpdate(req.params.postId, {
-      $push: { comments: comment.id }
-    })
-    res.status(201).json(post)
-  } catch (err) {
-    res.status(500).end()
-  }
-})
+// get a specific post
+router.get(
+  '/:feedId/:postId',
+  tokenCheck,
+  feedCheck,
+  postCheck,
+  async (req, res) => {
+    try {
+      const { postId } = req.params
+      const post = await db.Post.findById(postId).populate(
+        'user',
+        '-email -password'
+      )
+      const comments = await db.Post.find({
+        _id: { $in: post.comments }
+      }).populate('user', '-email -password')
 
-// Post a reply to a comment
-router.post(':feedId/:postId/:commentId', tokenVerification, feedVerification, async (req, res) => {
-  try {
-    const { body } = req.body
-    const reply = await db.Comment.create({
-      body,
-      user: req.user.uid,
-      parent: req.params.commentId
-    })
-    const updatedComment = await db.Comment.findByIdAndUpdate(
-      req.params.commentId,
-      {
-        $push: { replies: reply.id }
-      },
-      { new: true }
-    )
-    res.status(201).json(updatedComment)
-  } catch (err) {
-    console.log(err)
-    res.status(500).end()
+      res.json({ post, comments })
+    } catch (err) {
+      console.log(err)
+      res.status(500).end()
+    }
   }
-})
+)
+
+// Post a comment
+router.post(
+  '/:feedId/:postId',
+  tokenCheck,
+  feedCheck,
+  postCheck,
+  async (req, res) => {
+    try {
+      const { postId, feedId } = req.params
+      const { body } = req.body
+      const post = await db.Post.create({
+        user: req.user.uid,
+        parent: postId,
+        feed: feedId,
+        body: body
+      })
+      // no await is fine here
+      await db.Post.findByIdAndUpdate(postId, {
+        $push: { comments: post._id }
+      })
+      post.populate('user', '-email -password', (err, doc) => {
+        if (err) throw err
+        res.json({ post: doc })
+      })
+    } catch (err) {
+      console.log(err)
+      res.status(500).end()
+    }
+  }
+)
 
 module.exports = router

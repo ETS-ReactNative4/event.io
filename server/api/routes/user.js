@@ -1,21 +1,23 @@
-const router = require('express').Router();
-const db = require('../models');
-const jwtCheck = require('../middleware/jwtCheck');
+const router = require('express').Router()
+const db = require('../models')
+const tokenCheck = require('../middleware/tokenCheck')
 
-router.get('/', jwtCheck, async (req, res) => {
+router.get('/', tokenCheck, async (req, res) => {
   try {
-    const user = await db.User.findById(req.user.uid).select('username email picture friends');
-    res.json(user);
+    const user = await db.User.findById(req.user.uid).select(
+      'username email picture friends'
+    )
+    res.json(user)
   } catch (err) {
-    console.log(err);
-    res.status(500).end();
+    console.log(err)
+    res.status(500).end()
   }
-});
+})
 
-router.get('/:id', jwtCheck, async (req, res) => {
+router.get('/:id', tokenCheck, async (req, res) => {
   try {
-    const user = await db.User.findById(req.user.uid);
-    const isFriend = user.friends.includes(req.params.id);
+    const user = await db.User.findById(req.user.uid)
+    const isFriend = user.friends.includes(req.params.id)
 
     const other = isFriend
       ? await db.User.findById(req.params.id)
@@ -23,10 +25,10 @@ router.get('/:id', jwtCheck, async (req, res) => {
           .select('-email -password')
       : await db.User.findById(req.params.id)
           .populate('friends', '-email -password -friends')
-          .select('-email -password');
-    res.json(other);
+          .select('-email -password')
+    res.json(other)
   } catch (err) {
-    console.log(err);
+    console.log(err)
   }
-});
-module.exports = router;
+})
+module.exports = router

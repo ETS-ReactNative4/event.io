@@ -6,7 +6,12 @@ export default function FeedList(props) {
   const EmptyList = () => {
     return (
       <View
-        style={{ paddingVertical: 12, flex: 1, justifyContent: 'center', alignItems: 'center' }}
+        style={{
+          paddingVertical: 12,
+          flex: 1,
+          justifyContent: 'center',
+          alignItems: 'center'
+        }}
       >
         <Text>No feeds available.</Text>
       </View>

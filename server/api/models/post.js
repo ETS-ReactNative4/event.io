@@ -1,9 +1,22 @@
 const mongoose = require('mongoose')
 
 const PostSchema = new mongoose.Schema({
-  feed: { type: mongoose.SchemaTypes.ObjectId, ref: 'Feed', required: true },
-  likes: [{ type: mongoose.SchemaTypes.ObjectId, ref: 'User', default: [] }],
-  comments: [{ type: mongoose.SchemaTypes.ObjectId, ref: 'Comment', default: [] }],
+  parent: {
+    type: mongoose.SchemaTypes.ObjectId,
+    ref: 'Post',
+    default: null
+  },
+  feed: {
+    type: mongoose.SchemaTypes.ObjectId,
+    ref: 'Feed',
+    required: true
+  },
+  likes: [
+    { type: mongoose.SchemaTypes.ObjectId, ref: 'User', default: [] }
+  ],
+  comments: [
+    { type: mongoose.SchemaTypes.ObjectId, ref: 'Post', default: [] }
+  ],
   user: {
     type: mongoose.SchemaTypes.ObjectId,
     ref: 'User',

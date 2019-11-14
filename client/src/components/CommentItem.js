@@ -8,25 +8,16 @@ export default function CommentItem({ comment }) {
   const [likeToggle, setLikeToggle] = useState()
   const postCtx = useContext(PostContext)
 
-  useEffect(() => {
-  }, [])
-
   function onReply() {}
   function onComment() {}
   function onLike() {}
 
   return (
-    <BasePost 
-      likeToggle={likeToggle} 
-      commentToggle={replyToggle} 
-      onReply={onReply}/>
+    <BasePost
+      post={comment}
+      likeToggle={likeToggle}
+      commentToggle={replyToggle}
+      onReply={onReply}
+    />
   )
 }
-
-const styles = StyleSheet.create({
-  container: {
-    flexDirection: 'row',
-    padding: 12,
-    backgroundColor: '#f0f8ff'
-  }
-})

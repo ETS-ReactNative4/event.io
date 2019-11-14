@@ -44,10 +44,9 @@ export default function ExploreScreen({ navigation }) {
         region={{
           latitude: position.latitude,
           longitude: position.longitude,
-          latitudeDelta: 0.0522,
-          longitudeDelta: 0.0521
+          latitudeDelta: 0.03,
+          longitudeDelta: 0.03
         }}
-        showsUserLocation={true}
         showsBuildings={false}
         pitchEnabled={false}
       >
@@ -60,12 +59,16 @@ export default function ExploreScreen({ navigation }) {
         {feeds &&
           _.toArray(feeds).map(feed => {
             return (
-              <Marker key={feed._id} coordinate={feed.location} pinColor='darkseagreen'>
+              <Marker
+                key={feed._id}
+                coordinate={feed.location}
+                pinColor='darkseagreen'
+              >
                 <Callout
                   tooltip={true}
                   onPress={() =>
-                    navigation.navigate('NoteDetails', {
-                      post: feed
+                    navigation.push('FeedDetails', {
+                      feed
                     })
                   }
                 >
@@ -74,7 +77,11 @@ export default function ExploreScreen({ navigation }) {
               </Marker>
             )
           })}
-        <Icon style={[styles.icon, { bottom: 0 }]} onPress={center} name='locate' />
+        <Icon
+          style={[styles.icon, { bottom: 0 }]}
+          onPress={center}
+          name='locate'
+        />
       </MapView>
     </View>
   )

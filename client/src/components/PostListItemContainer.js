@@ -1,18 +1,21 @@
-import React, { useState, useEffect, useContext } from 'react'
-import { ActivityIndicator, View } from 'react-native'
-import PostListItem from './PostListItem'
-import { withNavigation } from 'react-navigation'
+import React, { useEffect, useContext } from 'react'
+import { View, ActivityIndicator } from 'react-native'
 import { PostContext } from '../context/PostContext'
+import { withNavigation } from 'react-navigation'
+import PostListItem from './PostListItem'
 
-export default function PostListItemContainer({ id, navigation, showAvatar, showOptions }) {
-  console.log('PostListItemContainer::render')
-  const { posts, setLikePost, fetchComments } = useContext(PostContext)
-  const [comments, setComments] = useState()
-  const post = posts ? posts[id] : null
+export default withNavigation(PostListItemContainer)
+function PostListItemContainer({
+  navigation,
+  postId,
+  feedId,
+  showAvatar,
+  showOptions
+}) {
+  const { posts, fetchPosts, setLikePost } = useContext(PostContext)
+  const post = posts && posts[postId]
+  useEffect(() => fetchPosts(postId, feedId), [])
 
-  function onReply() {
-    navigation.push('Post', { post })
-  }
   return (
     <>
       {post ? (
@@ -20,9 +23,8 @@ export default function PostListItemContainer({ id, navigation, showAvatar, show
           showOptions={showOptions}
           showAvatar={showAvatar}
           post={post}
-          comments={comments}
-          onLike={like => setLikePost(post._id, like)}
-          onReply={onReply}
+          onLike={like => setLikePost(postId, like)}
+          onReply={() => navigation.push('Post', { post: post })}
         />
       ) : (
         <View style={{ padding: 12, justifyContent: 'center' }}>

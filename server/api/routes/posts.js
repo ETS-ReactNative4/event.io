@@ -8,15 +8,15 @@
 */
 const router = require('express').Router()
 const db = require('../models')
-const tokenCheck = require('../middleware/jwtCheck')
+const tokenCheck = require('../middleware/tokenCheck')
 
 // get users posts
 router.get('/', tokenCheck, async (req, res) => {
   try {
-    const posts = await db.Post.find({ user: req.user.uid, parent: null }).populate(
-      'user',
-      '-email, -password'
-    )
+    const posts = await db.Post.find({
+      user: req.user.uid,
+      parent: null
+    }).populate('user', '-email, -password')
     res.json(posts)
   } catch (err) {
     console.log(err)
@@ -50,11 +50,13 @@ router.post('/', tokenCheck, async (req, res) => {
 // get post with comments
 router.get('/:id', tokenCheck, async (req, res) => {
   try {
-    const post = await db.Post.findById(req.params.id).populate('user', '-email -password')
-    const comments = await db.Comment.find({ _id: { $in: post.comments } }).populate(
+    const post = await db.Post.findById(req.params.id).populate(
       'user',
       '-email -password'
     )
+    const comments = await db.Comment.find({
+      _id: { $in: post.comments }
+    }).populate('user', '-email -password')
     res.json(comments)
   } catch (err) {
     res.status(500).end()
@@ -86,10 +88,9 @@ router.post('/:id', tokenCheck, async (req, res) => {
 router.get('/:id/children', tokenCheck, async (req, res) => {
   try {
     const post = await db.Post.findById(req.params.id)
-    const children = await db.Post.find({ _id: { $in: post.children } }).populate(
-      'user',
-      '-email -password'
-    )
+    const children = await db.Post.find({
+      _id: { $in: post.children }
+    }).populate('user', '-email -password')
     res.json(children)
   } catch (err) {
     console.log(err)
@@ -99,7 +100,10 @@ router.get('/:id/children', tokenCheck, async (req, res) => {
 // get likes for secific posts
 router.get('/:id/likes', tokenCheck, async (req, res) => {
   try {
-    const post = await db.Post.findById(req.params.id).populate('likes', '-email -password')
+    const post = await db.Post.findById(req.params.id).populate(
+      'likes',
+      '-email -password'
+    )
     res.json({ likes: post.likes })
   } catch (err) {
     console.log(err)

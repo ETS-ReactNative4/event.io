@@ -1,20 +1,22 @@
-import React from 'react';
-import { TouchableHighlight, View, Text } from 'react-native';
-import { withNavigation } from 'react-navigation';
-import Avatar from './Avatar';
+import React from 'react'
+import { TouchableHighlight, View, Text } from 'react-native'
+import { withNavigation } from 'react-navigation'
+import Avatar from './Avatar'
 
 function FeedItem({ navigation, feed }) {
   return (
     <TouchableHighlight
-      underlayColor="lightgray"
-      onPress={() => navigation.push('FeedDetails', { feed })}>
+      underlayColor='lightgray'
+      onPress={() => navigation.push('FeedDetails', { feed })}
+    >
       <View
         style={{
           flexDirection: 'row',
           padding: 12,
           borderBottomWidth: 1,
-          borderBottomColor: 'lightgray',
-        }}>
+          borderBottomColor: 'lightgray'
+        }}
+      >
         <Avatar rounded={false} size={64} user={feed.user} />
         <View style={{ flex: 1 }}>
           <View style={{ marginLeft: 12 }}>
@@ -22,8 +24,9 @@ function FeedItem({ navigation, feed }) {
               style={{
                 fontSize: 14,
                 marginBottom: 3,
-                fontWeight: 'bold',
-              }}>
+                fontWeight: 'bold'
+              }}
+            >
               {feed.user.username}
             </Text>
             <Text style={{ fontSize: 16, marginBottom: 3 }}>{feed.title}</Text>
@@ -32,6 +35,7 @@ function FeedItem({ navigation, feed }) {
         </View>
       </View>
     </TouchableHighlight>
-  );
+  )
 }
-export default withNavigation(FeedItem);
+
+export default withNavigation(FeedItem)

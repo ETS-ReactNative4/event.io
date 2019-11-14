@@ -1,90 +1,18 @@
-import React, { useState, useContext, useEffect, useReducer } from 'react'
+import React, { useState, useContext } from 'react'
 import { AuthContext } from './AuthContext'
 import Geolocation from '@react-native-community/geolocation'
 import _ from 'lodash'
 
 export const PostContext = React.createContext()
-
 export const PostProvider = props => {
   // state
   const [feeds, setFeeds] = useState(null)
   const [posts, setPosts] = useState(null)
-  const [comments, setComments] = useState({})
-  const [profiles, setProfiles] = useState({})
-
+  const [profiles, setProfiles] = useState(null)
   // context
   const auth = useContext(AuthContext)
 
-  // Comments
-  async function getComments(postId) {
-    const post = posts[postId]
-    if (post && post.comments) {
-      const out = []
-      for (let commentId of post.comments) {
-        const comment = comments[commentId]
-        if (comment) {
-          out.push(comment)
-        } else {
-          return await fetchComments(postId)
-        }
-      }
-      return out
-    } else {
-      return await fetchComments(postId)
-    }
-  }
-
-  async function fetchComments(postId) {
-    try {
-      const res = await auth.get(`/posts/${postId}`)
-      if (res.ok) {
-        const data = await res.json()
-        const cache = {}
-        for (let comment of data) {
-          cache[comment._id] = comment
-        }
-        setComments({ ...comments, ...cache })
-        return data
-      }
-    } catch (err) {
-      console.log(err)
-      return null
-    }
-  }
-
-  async function createComment(postId, comment) {
-    try {
-      const res = await auth.get(`/posts/${postId}`, {
-        method: 'post',
-        headers: {
-          'content-type': 'application/json'
-        },
-        body: JSON.stringify(comment)
-      })
-      if (res.ok) {
-        const data = await res.json()
-        setPosts({ ...posts, [data._id]: data })
-        return data
-      } else {
-        console.log('Error creating comment', JSON.stringify(res, null, 2))
-        return null
-      }
-    } catch (err) {
-      console.log(err)
-      return null
-    }
-  }
-
   // FEEDS fetch -> create
-  async function getFeeds() {
-    if (feeds) {
-      return feeds
-    } else {
-      const _feeds = await fetchFeeds()
-      return _feeds
-    }
-  }
-
   async function fetchFeeds() {
     try {
       const res = await auth.get('/feed')
@@ -99,6 +27,34 @@ export const PostProvider = props => {
       }
     } catch (err) {
       console.log('Error::PostContext::fetchFeed', err)
+      return null
+    }
+  }
+
+  async function fetchFeed(feedId) {
+    try {
+      const res = await auth.get(`/feed/${feedId}`)
+      if (res.ok) {
+        const data = await res.json()
+        const newPosts = {}
+        for (let post of data.posts) {
+          newPosts[post._id] = post
+        }
+        // check for null
+        if (posts) {
+          setPosts({ ...posts, ...newPosts })
+        } else {
+          setPosts({ ...newPosts })
+        }
+        return data
+      } else {
+        console.log(
+          'Error::PostContext::fetchFeed\nError fetching feed from server'
+        )
+        return null
+      }
+    } catch (err) {
+      console.log(err)
       return null
     }
   }
@@ -121,12 +77,13 @@ export const PostProvider = props => {
           })
           if (res.ok) {
             const createdFeed = await res.json()
-            const updatedFeeds = [...feeds]
-            updatedFeeds.push(createdFeed)
-            setFeeds(updatedFeeds)
+            setFeeds({ [createdFeed._id]: createdFeed, ...feeds })
             return createdFeed
           } else {
-            console.log('Error creating feed. Server responded with status code', res)
+            console.log(
+              'Error creating feed. Server responded with status code',
+              res
+            )
             return null
           }
         },
@@ -142,24 +99,66 @@ export const PostProvider = props => {
   }
 
   // Posts => fetch -> get -> create
-  async function fetchPosts(feedId) {
+  async function getComments(feedId, postId) {
     try {
-      const res = await auth.get(`/feed/${feedId}`)
+      const post = posts[postId]
+      if (post) {
+        const out = []
+        for (const commentId of post.comments) {
+          const comment = posts[commentId]
+          if (!comment) {
+            return await fetchPosts(feedId, postId)
+          } else {
+            out.push(comment)
+          }
+        }
+        return { feed: feeds[feedId], comments: out }
+      } else {
+        return await fetchPosts(feedId, postId)
+      }
+    } catch (err) {
+      console.log(err)
+    }
+  }
+
+  async function getPosts(feedId, postId) {
+    try {
+      const post = posts[postId]
+      if (!post) {
+        return await fetchPosts(feedId, postId)
+      } else {
+        const out = {}
+        for (let commentId of post) {
+          const comment = posts[commentId]
+          if (!comment) {
+            return await fetchPosts(feedId, postId)
+          } else {
+            out[comment._id] = comment
+          }
+          return { post, comments: out }
+        }
+      }
+    } catch (err) {
+      console.log(err)
+    }
+  }
+
+  async function fetchPosts(feedId, postId) {
+    try {
+      const res = await auth.get(`/feed/${feedId}/${postId}`)
       if (res.ok) {
         const data = await res.json()
-        const newPosts = {}
-        for (let post of data.posts) {
-          newPosts[post._id] = post
+        posts[data.post._id] = data.post
+        for (let post of data.comments) {
+          posts[post._id] = post
         }
-        // check for null
-        if (posts) {
-          setPosts({ ...posts, ...newPosts })
-        } else {
-          setPosts({ ...newPosts })
-        }
+        setPosts(posts)
         return data
       } else {
-        console.log('Error::PostContext::fetchPosts\nError fetching post from server')
+        console.log(
+          'Error::PostContext::fetchPosts\nError fetching post from server',
+          res
+        )
         return null
       }
     } catch (err) {
@@ -168,48 +167,29 @@ export const PostProvider = props => {
     }
   }
 
-  // returns all posts from a feed.
-  async function getPosts(feedId) {
-    async function defaultToFetch() {
-      console.log('PostContext:getPosts:defaulting to fetch')
-      const fetchedData = await fetchPosts(feedId)
-      return fetchedData
-    }
-    const feed = feeds[feedId]
-    if (!feed) {
-      console.log('Error:PostContext:getPosts: attempting to access posts from non existant feed')
-      return null
-    } else {
-      const feedPosts = []
-      for (postId of feed.posts) {
-        if (!posts) {
-          return await defaultToFetch()
-        }
-        const post = posts[postId]
-        if (!post) {
-          return await defaultToFetch()
-        } else {
-          feedPosts.push(post)
-        }
-      }
-      return { feed, posts: feedPosts }
-    }
-  }
-
-  async function createPost(feedId, post) {
+  async function createPost(feedId, body, postId) {
     try {
-      const res = await auth.get(`/feed/${feedId}`, {
+      const url = postId ? `/feed/${feedId}/${postId}` : `/feed/${feedId}`
+      const res = await auth.get(url, {
         method: 'post',
         headers: {
           'content-type': 'application/json'
         },
-        body: JSON.stringify(post)
+        body: JSON.stringify(body)
       })
       if (res.ok) {
-        // return supdated feed
         const data = await res.json()
-        setFeeds({ ...feeds, [data.feed._id]: data.feed })
-        setPosts({ ...posts, [data.post._id]: data.post })
+        if (!postId) {
+          fetchFeed(feedId)
+          //setFeeds({ ...feeds, [data.feed._id]: data.feed })
+          //setPosts({ ...posts, [data.post._id]: data.post })
+        } else {
+          fetchPosts(feedId, postId)
+          // setPosts({
+          //   ...posts,
+          //   [data.post._id]: data.post
+          // })
+        }
         console.log(data)
         return data
       } else {
@@ -234,7 +214,9 @@ export const PostProvider = props => {
       })
       if (res.ok) {
         const data = await res.json()
-        setPosts({ ...posts, [id]: data })
+        posts[id] = data
+        setPosts(posts)
+        return data
       } else {
         console.log('error posting like to server', res)
       }
@@ -242,8 +224,8 @@ export const PostProvider = props => {
       console.log(err)
     }
   }
-  // Profiles
 
+  // Profiles
   async function getProfile(id) {
     try {
       if (!profiles[id]) {
@@ -280,18 +262,15 @@ export const PostProvider = props => {
   return (
     <PostContext.Provider
       value={{
-        // comments
-        fetchComments,
-        createComment,
         // feeds
         feeds,
-        getFeeds,
         fetchFeeds,
+        fetchFeed,
         createFeed,
         // posts
         posts,
-        getPosts,
         fetchPosts,
+        getPosts,
         createPost,
         setLikePost,
         // profile

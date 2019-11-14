@@ -24,10 +24,13 @@ export default function FeedInfo({ feed }) {
           <Text style={{ fontSize: 16, marginBottom: 6 }}>{feed.title}</Text>
           <Text style={{ marginBottom: 6, fontSize: 12 }}>
             <Text style={{ fontWeight: 'bold' }}>{feed.audience} </Text>
-            feed created by <Text style={{ fontWeight: 'bold' }}>{feed.user.username}</Text>
+            feed created by{' '}
+            <Text style={{ fontWeight: 'bold' }}>{feed.user.username}</Text>
           </Text>
           {feed.address && (
-            <Text style={{ fontStyle: 'italic', fontSize: 12, color: '#444' }}>{feed.address}</Text>
+            <Text style={{ fontStyle: 'italic', fontSize: 12, color: '#444' }}>
+              {feed.address}
+            </Text>
           )}
           {/* <TouchableOpacity onPress={toggleDescription}>
             <Text

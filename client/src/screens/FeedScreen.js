@@ -1,6 +1,5 @@
 import React, { useContext, useEffect, useState } from 'react'
-import { TouchableOpacity, Text, View } from 'react-native'
-import { FlatList } from 'react-navigation'
+import { TouchableOpacity } from 'react-native'
 import { PostContext } from '../context/PostContext'
 import Search from '../components/Search'
 import FeedList from '../components/FeedList'
@@ -12,46 +11,39 @@ FeedScreen.navigationOptions = ({ navigation }) => {
     title: 'Feeds',
     headerRight: (
       <TouchableOpacity onPress={() => navigation.navigate('CreateFeed')}>
-        <Icon style={{ fontSize: 32, marginRight: 24 }} name='add-circle-outline' />
+        <Icon
+          style={{ fontSize: 32, marginRight: 24 }}
+          name='add-circle-outline'
+        />
       </TouchableOpacity>
     )
   }
 }
 
 function FeedScreen({ navigation }) {
-  const { getFeeds, fetchFeeds, posts } = useContext(PostContext)
-  const [internalFeeds, setInternalFeeds] = useState([])
+  const { fetchFeeds, feeds } = useContext(PostContext)
   const [refreshing, setRefreshing] = useState(false)
-  const REFRESH_RATE = 60 * 1000
-
-  // On mount
+  // initialize first get and subsequent refresheu
   useEffect(() => {
-    getFeeds().then(feeds => setInternalFeeds(feeds))
-    let interval = setInterval(syncFeeds, REFRESH_RATE)
-    return () => clearInterval(interval)
+    fetchFeeds()
+    navigation.addListener('willFocus', fetchFeeds)
   }, [])
-
-  async function syncFeeds() {
-    const feeds = await fetchFeeds()
-    setInternalFeeds(feeds)
-    return feeds
-  }
 
   async function handleRefresh() {
     setRefreshing(true)
-    await syncFeeds()
+    await fetchFeeds()
     setRefreshing(false)
   }
 
   return (
-    <React.Fragment>
+    <>
       <Search />
       <FeedList
         refreshing={refreshing}
         onRefresh={handleRefresh}
-        feeds={_.toArray(internalFeeds)}
+        feeds={_.toArray(feeds)} // re renders on every change need to get rid of this
       />
-    </React.Fragment>
+    </>
   )
 }
 

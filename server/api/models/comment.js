@@ -1,4 +1,4 @@
-const mongoose = require('mongoose');
+const mongoose = require('mongoose')
 
 const CommentSchema = new mongoose.Schema({
   parent: {
@@ -6,8 +6,12 @@ const CommentSchema = new mongoose.Schema({
     ref: 'Comment',
     default: null
   },
-  replies: [{ type: mongoose.SchemaTypes.ObjectId, ref: 'Comment', default: [] }],
-  likes: [{ type: mongoose.SchemaTypes.ObjectId, ref: 'User', default: [] }],
+  replies: [
+    { type: mongoose.SchemaTypes.ObjectId, ref: 'Comment', default: [] }
+  ],
+  likes: [
+    { type: mongoose.SchemaTypes.ObjectId, ref: 'User', default: [] }
+  ],
   user: {
     type: mongoose.SchemaTypes.ObjectId,
     ref: 'User',
@@ -21,6 +25,6 @@ const CommentSchema = new mongoose.Schema({
     type: Date,
     default: Date.now
   }
-});
+})
 
-module.exports = mongoose.model('Comment', CommentSchema);
+module.exports = mongoose.model('Comment', CommentSchema)

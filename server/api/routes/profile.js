@@ -1,8 +1,8 @@
 const router = require('express').Router()
 const db = require('../models')
-const tokenVerification = require('../middleware/jwtCheck')
+const tokenCheck = require('../middleware/tokenCheck')
 
-router.get('/:uid', tokenVerification, async (req, res) => {
+router.get('/:uid', tokenCheck, async (req, res) => {
   const user = await db.User.findById(req.user.uid)
   let relationship = null
   if (req.params.uid === user.id) {
@@ -37,8 +37,13 @@ router.get('/:uid', tokenVerification, async (req, res) => {
     }
     case 'friend': {
       try {
-        const friend = await db.User.findById(req.params.uid).select('-email -password')
-        const posts = await db.Post.find({ user: req.params.uid, parent: null })
+        const friend = await db.User.findById(req.params.uid).select(
+          '-email -password'
+        )
+        const posts = await db.Post.find({
+          user: req.params.uid,
+          parent: null
+        })
           .populate('user', '-email -password')
           .sort({ createdAt: -1 })
         res.json({
@@ -59,7 +64,9 @@ router.get('/:uid', tokenVerification, async (req, res) => {
     }
     case 'other': {
       try {
-        const other = await db.User.findById(req.params.uid).select('-email -password -friends')
+        const other = await db.User.findById(req.params.uid).select(
+          '-email -password -friends'
+        )
         res.json({
           user: {
             uid: other.id,

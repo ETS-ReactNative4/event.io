@@ -6,8 +6,12 @@ const FeedSchema = new mongoose.Schema({
     ref: 'User',
     required: true
   },
-  subscribers: [{ type: mongoose.SchemaTypes.ObjectId, ref: 'User', default: [] }],
-  posts: [{ type: mongoose.SchemaTypes.ObjectId, ref: 'Post', default: [] }],
+  subscribers: [
+    { type: mongoose.SchemaTypes.ObjectId, ref: 'User', default: [] }
+  ],
+  posts: [
+    { type: mongoose.SchemaTypes.ObjectId, ref: 'Post', default: [] }
+  ],
   location: {
     latitude: Number,
     longitude: Number

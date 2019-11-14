@@ -1,72 +1,110 @@
 import React, { useContext, useState, useEffect } from 'react'
-import { StyleSheet, View, LayoutAnimation, Text, ActivityIndicator } from 'react-native'
-import Avatar from './Avatar'
-import PostOptions from './PostOptions'
-import PostListItemContainer from './PostListItemContainer'
+import {
+  StyleSheet,
+  View,
+  LayoutAnimation,
+  ActivityIndicator
+} from 'react-native'
+import { withNavigation } from 'react-navigation'
+import { PostContext } from '../context/PostContext'
 import { AuthContext } from '../context/AuthContext'
-import PostHeader from './PostHeader'
+import Avatar from './Avatar'
 import BasePost from './BasePost'
 
-const PostListItem = ({ post, comments, onLike, onReply }) => {
-  const [commentToggle, setCommentToggle] = useState(false)
-  const auth = useContext(AuthContext)
-  const [likeToggle, setLikeToggle] = useState(post.likes.includes(auth.user.uid))
+const PostListItem = withNavigation(
+  ({ navigation, postId, feedId, showAvatar = true }) => {
+    const postCtx = useContext(PostContext)
+    const authCtx = useContext(AuthContext)
+    const post = postCtx.posts && postCtx.posts[postId]
+    const [comments, setComments] = useState()
 
-  function handleLike(like) {
-    setLikeToggle(like)
-    onLike(like)
-  }
-
-  async function handleOnComment() {
-    if (!comments || comments.length === 0) return
-    LayoutAnimation.configureNext(
-      LayoutAnimation.create(
-        200,
-        LayoutAnimation.Types.easeInEaseOut,
-        LayoutAnimation.Properties.opacity
-      )
+    const [commentToggle, setCommentToggle] = useState(false)
+    const [likeToggle, setLikeToggle] = useState(
+      post && post.likes.includes(authCtx.user.uid)
     )
-    setCommentToggle(!commentToggle)
-  }
-  const content = (
-    <React.Fragment>
-      <View
-        style={[
-          styles.container,
-          commentToggle ? { backgroundColor: '#eee' } : { backgroundColor: 'white' }
-        ]}
-      >
-        <Avatar style={styles.avatar} user={post.user} size={48} />
-        <BasePost
-          post={post}
-          comments={comments}
-          onLike={handleLike}
-          onComment={handleOnComment}
-          onReply={onReply}
-          likeToggle={likeToggle}
-          commentToggle={commentToggle}
-        />
-      </View>
 
-      {commentToggle && (
-        <View>
+    useEffect(() => {
+      postCtx.getPosts(feedId, postId).then(data =>
+        //
+        setComments(data.comments)
+      )
+    }, [])
+
+    const onLike = like => {
+      setLikeToggle(like)
+      postCtx.setLikePost(postId, like)
+    }
+    const onReply = () => {
+      if (post) {
+        navigation.push('Post', { post: post })
+      }
+    }
+    const onComment = () => {
+      if (!post.comments || post.comments.length === 0) return
+      LayoutAnimation.configureNext(
+        LayoutAnimation.create(
+          200,
+          LayoutAnimation.Types.easeInEaseOut,
+          LayoutAnimation.Properties.opacity
+        )
+      )
+      setCommentToggle(!commentToggle)
+    }
+
+    const content = (
+      <>
+        {post && (
           <View
-            style={{
-              marginLeft: 12,
-              borderLeftWidth: 1,
-              borderLeftColor: 'lightgray'
-            }}
+            style={[
+              styles.container,
+              commentToggle
+                ? { backgroundColor: '#eee' }
+                : { backgroundColor: 'white' }
+            ]}
           >
-            {comments.map(post => {
-              return <BasePost post={post} />
-            })}
+            {showAvatar && (
+              <Avatar style={styles.avatar} user={post.user} size={48} />
+            )}
+            <BasePost
+              style={showAvatar && { marignLeft: 0 }}
+              post={post}
+              onLike={onLike}
+              onComment={onComment}
+              onReply={onReply}
+              likeToggle={likeToggle}
+              commentToggle={commentToggle}
+            />
           </View>
+        )}
+        {commentToggle && (
+          <View>
+            <View style={styles.commentsContainer}>
+              {post.comments.map(comment => {
+                return (
+                  <PostListItem
+                    showAvatar={false}
+                    postId={comment}
+                    feedId={feedId}
+                  />
+                )
+              })}
+            </View>
+          </View>
+        )}
+      </>
+    )
+
+    if (post) {
+      return content
+    } else {
+      return (
+        <View style={{ padding: 12 }}>
+          <ActivityIndicator />
         </View>
-      )}
-    </React.Fragment>
-  )
-  return <React.Fragment>{post ? content : <ActivityIndicator />}</React.Fragment>
-}
+      )
+    }
+  }
+)
 export default PostListItem
 
 const styles = StyleSheet.create({
@@ -75,6 +113,11 @@ const styles = StyleSheet.create({
     paddingHorizontal: 12,
     paddingVertical: 6,
     backgroundColor: '#f0f8ff'
+  },
+  commentsContainer: {
+    marginLeft: 12,
+    borderLeftWidth: 1,
+    borderLeftColor: 'lightgray'
   },
   mainContent: {
     flex: 1,

@@ -1,8 +1,8 @@
 const router = require('express').Router()
 const db = require('../models')
-const authCheck = require('../middleware/jwtCheck')
+const tokenCheck = require('../middleware/tokenCheck')
 
-router.get('/', authCheck, async (req, res) => {
+router.get('/', tokenCheck, async (req, res) => {
   try {
     const friends = await db.User.findById(req.user.uid)
       .populate('friends', '-email -password -friends')
@@ -15,7 +15,7 @@ router.get('/', authCheck, async (req, res) => {
 })
 
 // get all requests that user has recieved
-router.get('/requests', authCheck, async (req, res) => {
+router.get('/requests', tokenCheck, async (req, res) => {
   try {
     const friendRequests = await db.FriendRequest.find({
       to: req.user.uid,
@@ -29,12 +29,12 @@ router.get('/requests', authCheck, async (req, res) => {
 })
 
 // get all requests that user has sent
-router.get('/requests/sent', authCheck, async (req, res) => {
+router.get('/requests/sent', tokenCheck, async (req, res) => {
   try {
-    const requests = await db.FriendRequest.find({ from: req.user.id, closed: false }).populate(
-      'from to',
-      '-password -email'
-    )
+    const requests = await db.FriendRequest.find({
+      from: req.user.id,
+      closed: false
+    }).populate('from to', '-password -email')
     res.json(requests)
   } catch (err) {
     console.log(err)
@@ -43,7 +43,7 @@ router.get('/requests/sent', authCheck, async (req, res) => {
 })
 
 // create friend request
-router.post('/requests', authCheck, async (req, res) => {
+router.post('/requests', tokenCheck, async (req, res) => {
   try {
     const { to } = req.body
     // check if request already exists
@@ -73,7 +73,7 @@ router.post('/requests', authCheck, async (req, res) => {
 })
 
 // accept or decline friend request
-router.put('/requests/:id', authCheck, async (req, res) => {
+router.put('/requests/:id', tokenCheck, async (req, res) => {
   try {
     const { accepted } = req.body
     if (accepted === undefined || accepted === null) {
@@ -107,8 +107,14 @@ router.put('/requests/:id', authCheck, async (req, res) => {
       req.io.to(fromSocketId).emit('friendRequest')
     }
     if (accepted) {
-      await db.User.updateOne({ _id: friendRequest.to }, { $push: { friends: friendRequest.from } })
-      await db.User.updateOne({ _id: friendRequest.from }, { $push: { friends: friendRequest.to } })
+      await db.User.updateOne(
+        { _id: friendRequest.to },
+        { $push: { friends: friendRequest.from } }
+      )
+      await db.User.updateOne(
+        { _id: friendRequest.from },
+        { $push: { friends: friendRequest.to } }
+      )
       if (toSocketId) {
         req.io.to(toSocketId).emit('friend')
       }

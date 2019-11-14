@@ -25,6 +25,7 @@ const PostListItemOptions = ({
       ? post.likes.length + 1
       : post.likes.length
   }
+
   return (
     <View style={styles.container}>
       <View style={{ flexDirection: 'row', alignItems: 'center' }}>

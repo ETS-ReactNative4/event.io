@@ -1,16 +1,15 @@
 import React from 'react'
 import { View, Text, FlatList } from 'react-native'
-import PostListItemContainer from './PostListItemContainer'
+import PostListItem from './PostListItem'
 
-export default React.memo(PostList)
-
-function PostList(props) {
+export default function PostList({ feed, posts }) {
+  const reversed = [...posts].reverse()
   const EmptyList = () => {
     return (
       <View
         style={{
           flex: 1,
-          paddingVertical: 12,
+          paddingVertical: 32,
           justifyContent: 'center',
           alignItems: 'center'
         }}
@@ -19,14 +18,18 @@ function PostList(props) {
       </View>
     )
   }
-  console.log('PostList::render')
   return (
-    <FlatList
-      {...props}
-      ListEmptyComponent={EmptyList()}
-      data={props.posts}
-      keyExtractor={item => item._id}
-      renderItem={({ item }) => <PostListItemContainer id={item} />}
-    />
+    feed.posts && (
+      <FlatList
+        ListEmptyComponent={<EmptyList />}
+        data={reversed}
+        keyExtractor={item => {
+          return item
+        }}
+        renderItem={({ item }) => (
+          <PostListItem postId={item} feedId={feed._id} />
+        )}
+      />
+    )
   )
 }

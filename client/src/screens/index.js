@@ -18,7 +18,13 @@ import ProfileIcon from '../components/ProfileIcon'
 import CommentsScreen from './CommentsScreen'
 import CreateFeedScreen from './CreateFeedScreen'
 import FeedDetailsScreen from './FeedDetailsScreen'
-import { fromBottom, fromTop, fromRight, zoomIn, zoomOut } from 'react-navigation-transitions'
+import {
+  fromBottom,
+  fromTop,
+  fromRight,
+  zoomIn,
+  zoomOut
+} from 'react-navigation-transitions'
 
 const TRANSITION_TIME = 1000 * 0.61803
 const GOLDEN_RATIO = 1.61803
@@ -29,12 +35,35 @@ const AuthNavigator = createStackNavigator({
   }
 })
 
-const ExploreStack = createStackNavigator({
-  Explore: ExploreScreen,
-  PostDetails: PostDetailsScreen,
-  Post: CreatePostScreen,
-  Camera: CameraScreen
-})
+const ExploreStack = createStackNavigator(
+  {
+    Explore: ExploreScreen,
+    FeedDetails: FeedDetailsScreen,
+    Camera: CameraScreen
+  },
+  {
+    transitionConfig: nav => {
+      const prevScene = nav.scenes[nav.scenes.length - 2]
+      const nextScene = nav.scenes[nav.scenes.length - 1]
+      if (
+        prevScene &&
+        prevScene.route.routeName === 'Explore' &&
+        nextScene.route.routeName === 'FeedDetails'
+      ) {
+        return zoomIn(TRANSITION_TIME / GOLDEN_RATIO)
+      }
+    },
+    defaultNavigationOptions: ({ navigation }) => {
+      switch (navigation.state.routeName) {
+        case 'Feed': {
+          return {
+            headerBackTitle: null
+          }
+        }
+      }
+    }
+  }
+)
 
 const FeedStack = createStackNavigator(
   {
@@ -45,7 +74,7 @@ const FeedStack = createStackNavigator(
     Profile: ProfileScreen
   },
   {
-    transitionConfig: nav => handleCustomTransition(nav),
+    transitionConfig: nav => handleFeedTransitions(nav),
     defaultNavigationOptions: ({ navigation }) => {
       switch (navigation.state.routeName) {
         case 'Feed': {
@@ -111,10 +140,9 @@ const BottomNavigator = createBottomTabNavigator(
   }
 )
 
-function handleCustomTransition({ scenes }) {
+function handleFeedTransitions({ scenes }) {
   const prevScene = scenes[scenes.length - 2]
   const nextScene = scenes[scenes.length - 1]
-  // Custom transitions go there
   if (
     prevScene &&
     prevScene.route.routeName === 'FeedDetails' &&
