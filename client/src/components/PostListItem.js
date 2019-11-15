@@ -22,14 +22,7 @@ const PostListItem = withNavigation(
     const [likeToggle, setLikeToggle] = useState(
       post && post.likes.includes(authCtx.user.uid)
     )
-
-    useEffect(() => {
-      postCtx.getPosts(feedId, postId).then(data =>
-        //
-        setComments(data.comments)
-      )
-    }, [])
-
+    navigation.addListener('willFocus', () => setComments(comments))
     const onLike = like => {
       setLikeToggle(like)
       postCtx.setLikePost(postId, like)
@@ -39,8 +32,11 @@ const PostListItem = withNavigation(
         navigation.push('Post', { post: post })
       }
     }
-    const onComment = () => {
+    const onComment = async () => {
       if (!post.comments || post.comments.length === 0) return
+      const data = await postCtx.getPosts(feedId, postId)
+      if (data && data.comments) setComments(data.comments)
+
       LayoutAnimation.configureNext(
         LayoutAnimation.create(
           200,
@@ -79,7 +75,7 @@ const PostListItem = withNavigation(
         {commentToggle && (
           <View>
             <View style={styles.commentsContainer}>
-              {post.comments.map(comment => {
+              {[...post.comments].reverse().map(comment => {
                 return (
                   <PostListItem
                     showAvatar={false}

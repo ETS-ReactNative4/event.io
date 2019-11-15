@@ -146,12 +146,16 @@ router.post(
         body: body
       })
       // no await is fine here
-      await db.Post.findByIdAndUpdate(postId, {
-        $push: { comments: post._id }
-      })
+      const parent = await db.Post.findByIdAndUpdate(
+        postId,
+        {
+          $push: { comments: post._id }
+        },
+        { new: true }
+      ).populate('user', '-email -password')
       post.populate('user', '-email -password', (err, doc) => {
         if (err) throw err
-        res.json({ post: doc })
+        res.json({ parent, post: doc })
       })
     } catch (err) {
       console.log(err)

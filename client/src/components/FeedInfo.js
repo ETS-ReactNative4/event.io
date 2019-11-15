@@ -1,8 +1,14 @@
-import React from 'react'
-import { View, Text, TouchableOpacity } from 'react-native'
+import React, { useState } from 'react'
+import { View, Text, TouchableOpacity, LayoutAnimation } from 'react-native'
 import Avatar from './Avatar'
 
 export default function FeedInfo({ feed }) {
+  const [showDescription, setShowDescription] = useState(false)
+
+  function toggleDescription() {
+    LayoutAnimation.easeInEaseOut()
+    setShowDescription(!showDescription)
+  }
   return (
     <View
       style={{
@@ -32,7 +38,7 @@ export default function FeedInfo({ feed }) {
               {feed.address}
             </Text>
           )}
-          {/* <TouchableOpacity onPress={toggleDescription}>
+          <TouchableOpacity onPress={toggleDescription}>
             <Text
               style={{
                 fontSize: 12,
@@ -42,12 +48,14 @@ export default function FeedInfo({ feed }) {
             >
               {showDescription ? 'Hide Info' : 'Show Info'}
             </Text>
-          </TouchableOpacity> */}
+          </TouchableOpacity>
         </View>
       </View>
-      {/* {showDescription && (
-        <Text style={{ paddingVertical: 6, fontSize: 14 }}>{feed.description}</Text>
-      )} */}
+      {showDescription && (
+        <Text style={{ paddingVertical: 6, fontSize: 14 }}>
+          {feed.description}
+        </Text>
+      )}
     </View>
   )
 }

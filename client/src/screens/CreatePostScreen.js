@@ -9,7 +9,7 @@ CreatePostScreen.navigationOptions = {
   title: 'Create Post'
 }
 export default function CreatePostScreen({ navigation }) {
-  const { createPost } = useContext(PostContext)
+  const { createPost, fetchFeed } = useContext(PostContext)
   const feed = navigation.getParam('feed', null)
   const post = navigation.getParam('post', null)
 

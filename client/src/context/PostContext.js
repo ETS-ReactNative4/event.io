@@ -1,4 +1,4 @@
-import React, { useState, useContext } from 'react'
+import React, { useState, useContext, useEffect } from 'react'
 import { AuthContext } from './AuthContext'
 import Geolocation from '@react-native-community/geolocation'
 import _ from 'lodash'
@@ -7,10 +7,16 @@ export const PostContext = React.createContext()
 export const PostProvider = props => {
   // state
   const [feeds, setFeeds] = useState(null)
-  const [posts, setPosts] = useState(null)
+  const [posts, setPosts] = useState({})
   const [profiles, setProfiles] = useState(null)
   // context
   const auth = useContext(AuthContext)
+
+  useEffect(() => {
+    if (auth.user) {
+      fetchProfile(auth.user.uid)
+    }
+  }, [auth])
 
   // FEEDS fetch -> create
   async function fetchFeeds() {
@@ -40,7 +46,6 @@ export const PostProvider = props => {
         for (let post of data.posts) {
           newPosts[post._id] = post
         }
-        // check for null
         if (posts) {
           setPosts({ ...posts, ...newPosts })
         } else {
@@ -98,37 +103,16 @@ export const PostProvider = props => {
     }
   }
 
-  // Posts => fetch -> get -> create
-  async function getComments(feedId, postId) {
-    try {
-      const post = posts[postId]
-      if (post) {
-        const out = []
-        for (const commentId of post.comments) {
-          const comment = posts[commentId]
-          if (!comment) {
-            return await fetchPosts(feedId, postId)
-          } else {
-            out.push(comment)
-          }
-        }
-        return { feed: feeds[feedId], comments: out }
-      } else {
-        return await fetchPosts(feedId, postId)
-      }
-    } catch (err) {
-      console.log(err)
-    }
-  }
-
+  // Returns cached post fetching as default
   async function getPosts(feedId, postId) {
     try {
+      if (!posts) return await fetchPosts(feedId, postId)
       const post = posts[postId]
       if (!post) {
         return await fetchPosts(feedId, postId)
       } else {
         const out = {}
-        for (let commentId of post) {
+        for (let commentId of post.comments) {
           const comment = posts[commentId]
           if (!comment) {
             return await fetchPosts(feedId, postId)
@@ -139,7 +123,8 @@ export const PostProvider = props => {
         }
       }
     } catch (err) {
-      console.log(err)
+      console.log('Error:getPosts', err)
+      return null
     }
   }
 
@@ -149,9 +134,10 @@ export const PostProvider = props => {
       if (res.ok) {
         const data = await res.json()
         posts[data.post._id] = data.post
-        for (let post of data.comments) {
-          posts[post._id] = post
-        }
+        if (data.comments && data.comments.length > 0)
+          for (let post of data.comments) {
+            posts[post._id] = post
+          }
         setPosts(posts)
         return data
       } else {
@@ -180,17 +166,16 @@ export const PostProvider = props => {
       if (res.ok) {
         const data = await res.json()
         if (!postId) {
-          fetchFeed(feedId)
-          //setFeeds({ ...feeds, [data.feed._id]: data.feed })
-          //setPosts({ ...posts, [data.post._id]: data.post })
+          feeds[data.feed._id] = data.feed
+          posts[data.post._id] = data.post
+          setFeeds({ ...feeds })
+          setPosts({ ...posts })
         } else {
-          fetchPosts(feedId, postId)
-          // setPosts({
-          //   ...posts,
-          //   [data.post._id]: data.post
-          // })
+          posts[data.post._id] = data.post
+          posts[data.parent._id] = data.parent
+          setPosts({ ...posts })
         }
-        console.log(data)
+        console.log('createPost:', JSON.stringify(data, null, 2))
         return data
       } else {
         console.log('Error creating post.', res)
@@ -248,9 +233,8 @@ export const PostProvider = props => {
     try {
       const res = await auth.get(`/profile/${id}`)
       const data = await res.json()
-      for (let post of data.posts) {
-        setPost(post._id, post)
-      }
+
+      setPosts({ ...posts, ...data.posts })
       setProfiles({ ...profiles, [id]: data })
       return data
     } catch (err) {

@@ -102,7 +102,7 @@ const SettingsStack = createStackNavigator({
 
 const BottomNavigator = createBottomTabNavigator(
   {
-    Notifications: SettingsStack,
+    //Notifications: SettingsStack,
     Explore: ExploreStack,
     Feed: FeedStack,
     Profile: ProfileStack,
