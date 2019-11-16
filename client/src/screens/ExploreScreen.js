@@ -77,11 +77,7 @@ export default function ExploreScreen({ navigation }) {
               </Marker>
             )
           })}
-        <Icon
-          style={[styles.icon, { bottom: 0 }]}
-          onPress={center}
-          name='locate'
-        />
+        <Icon style={styles.icon} onPress={center} name='locate' />
       </MapView>
     </View>
   )
@@ -97,9 +93,9 @@ const styles = StyleSheet.create({
   icon: {
     zIndex: 2,
     position: 'absolute',
-    left: 12,
+    left: 24,
+    bottom: 24,
     fontSize: 48,
-    bottom: 64,
     color: '#0275d8'
   }
 })

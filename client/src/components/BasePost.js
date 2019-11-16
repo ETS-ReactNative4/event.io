@@ -5,7 +5,9 @@ import { View, StyleSheet, Text } from 'react-native'
 
 export default function BasePost({
   style,
+  showOptions,
   post,
+  feed,
   onLike,
   onComment,
   onReply,
@@ -14,17 +16,23 @@ export default function BasePost({
 }) {
   return (
     <View style={[styles.container, style]}>
-      <PostHeader username={post.user.username} date={post.createdAt} />
-      <Text style={styles.body}>{post.body}</Text>
-      <PostOptions
-        comments={post.comments}
-        post={post}
-        onLike={onLike}
-        like={likeToggle}
-        commentToggle={commentToggle}
-        onComment={onComment}
-        onReply={onReply}
+      <PostHeader
+        feed={feed}
+        username={post.user.username}
+        date={post.createdAt}
       />
+      <Text style={styles.body}>{post.body}</Text>
+      {showOptions && (
+        <PostOptions
+          comments={post.comments}
+          post={post}
+          onLike={onLike}
+          like={likeToggle}
+          commentToggle={commentToggle}
+          onComment={onComment}
+          onReply={onReply}
+        />
+      )}
     </View>
   )
 }

@@ -28,6 +28,7 @@ app.use('/users', require('./api/routes/users'))
 app.use('/user', require('./api/routes/user'))
 app.use('/profile', require('./api/routes/profile'))
 app.use('/feed', require('./api/routes/feed'))
+app.use('/home', require('./api/routes/home'))
 
 // connect db
 mongoose.connect(MONGO_URI, {

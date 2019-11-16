@@ -13,4 +13,17 @@ router.get('/', tokenCheck, async (req, res) => {
   res.json(users)
 })
 
+router.get('/uid', tokenCheck, async (req, res) => {
+  const query = req.query.q
+  const userIds = query.split(',')
+
+  const promises = []
+  for (let id of userIds) {
+    promises.push(db.User.findById(id).select('-email -password'))
+  }
+  Promise.all(promises).then(vals => {
+    res.json({ users: vals })
+  })
+})
+
 module.exports = router

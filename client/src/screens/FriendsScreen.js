@@ -1,18 +1,18 @@
-import React, { useContext } from 'react';
-import { View, Text, FlatList } from 'react-native';
-import { AuthContext } from '../context/AuthContext';
-import { FriendsContext } from '../context/FriendsContext';
-import BaseUserListItem from '../components/BaseUserListItem';
-import Avatar from '../components/Avatar';
+import React, { useContext } from 'react'
+import { View, Text, FlatList } from 'react-native'
+import { AuthContext } from '../context/AuthContext'
+import { FriendsContext } from '../context/FriendsContext'
+import BaseUserListItem from '../components/BaseUserListItem'
+import Avatar from '../components/Avatar'
 
 export default FriendsScreen = ({ navigation }) => {
-  const authCtx = useContext(AuthContext);
-  const friendsCtx = useContext(FriendsContext);
+  const authCtx = useContext(AuthContext)
+  const friendsCtx = useContext(FriendsContext)
 
   async function getUserDetails(id) {
-    const res = await authCtx.get(`/user/${id}`);
-    const data = await res.json();
-    navigation.push('Profile', { id: id });
+    const res = await authCtx.get(`/user/${id}`)
+    const data = await res.json()
+    navigation.push('Profile', { id: id })
   }
 
   return (
@@ -28,7 +28,7 @@ export default FriendsScreen = ({ navigation }) => {
                 id={item._id}
                 user={item}
               />
-            );
+            )
           }}
         />
       ) : (
@@ -37,8 +37,8 @@ export default FriendsScreen = ({ navigation }) => {
         </Text>
       )}
     </View>
-  );
-};
+  )
+}
 FriendsScreen.navigationOptions = {
-  title: 'Following',
-};
+  title: 'Following'
+}

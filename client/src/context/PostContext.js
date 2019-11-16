@@ -14,9 +14,26 @@ export const PostProvider = props => {
 
   useEffect(() => {
     if (auth.user) {
+      fetchFeeds()
       fetchProfile(auth.user.uid)
     }
   }, [auth])
+
+  async function fetchHome() {
+    try {
+      const res = await auth.get('/home')
+      const homePosts = await res.json()
+      for (let post of homePosts) {
+        posts[post._id] = post
+      }
+      setPosts({ ...posts })
+      console.log(JSON.stringify(homePosts, null, 2))
+      return homePosts
+    } catch (err) {
+      console.log('Error:fetchHome', err)
+      return null
+    }
+  }
 
   // FEEDS fetch -> create
   async function fetchFeeds() {
@@ -70,8 +87,8 @@ export const PostProvider = props => {
         async pos => {
           const { audience, title, description } = feed
           const location = {
-            latitude: pos.coords.latitude + (Math.random() - 0.5) * 0.005,
-            longitude: pos.coords.longitude + (Math.random() - 0.5) * 0.005
+            latitude: pos.coords.latitude + (Math.random() - 0.5) * 0.05,
+            longitude: pos.coords.longitude + (Math.random() - 0.5) * 0.05
           }
           const res = await auth.get('/feed', {
             method: 'post',
@@ -199,8 +216,7 @@ export const PostProvider = props => {
       })
       if (res.ok) {
         const data = await res.json()
-        posts[id] = data
-        setPosts(posts)
+        setPosts({ ...posts, [id]: data })
         return data
       } else {
         console.log('error posting like to server', res)
@@ -233,9 +249,14 @@ export const PostProvider = props => {
     try {
       const res = await auth.get(`/profile/${id}`)
       const data = await res.json()
-
-      setPosts({ ...posts, ...data.posts })
-      setProfiles({ ...profiles, [id]: data })
+      console.log('fetchProfile:', JSON.stringify(data, null, 2))
+      if (data.posts) {
+        for (let post of data.posts) {
+          posts[post._id] = post
+        }
+        setPosts({ ...posts })
+        setProfiles({ ...profiles, [id]: data })
+      }
       return data
     } catch (err) {
       console.log('Error::PostContext::fetchProfile', err)
@@ -246,6 +267,7 @@ export const PostProvider = props => {
   return (
     <PostContext.Provider
       value={{
+        fetchHome,
         // feeds
         feeds,
         fetchFeeds,

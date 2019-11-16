@@ -6,6 +6,9 @@ const FeedSchema = new mongoose.Schema({
     ref: 'User',
     required: true
   },
+  thumbnail: {
+    type: String
+  },
   subscribers: [
     { type: mongoose.SchemaTypes.ObjectId, ref: 'User', default: [] }
   ],

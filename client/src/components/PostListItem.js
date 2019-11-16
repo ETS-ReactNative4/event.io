@@ -12,17 +12,23 @@ import Avatar from './Avatar'
 import BasePost from './BasePost'
 
 const PostListItem = withNavigation(
-  ({ navigation, postId, feedId, showAvatar = true }) => {
+  ({
+    navigation,
+    postId,
+    feedId,
+    showAvatar = true,
+    showFeed = false,
+    showOptions = true
+  }) => {
     const postCtx = useContext(PostContext)
     const authCtx = useContext(AuthContext)
     const post = postCtx.posts && postCtx.posts[postId]
     const [comments, setComments] = useState()
-
     const [commentToggle, setCommentToggle] = useState(false)
     const [likeToggle, setLikeToggle] = useState(
       post && post.likes.includes(authCtx.user.uid)
     )
-    navigation.addListener('willFocus', () => setComments(comments))
+
     const onLike = like => {
       setLikeToggle(like)
       postCtx.setLikePost(postId, like)
@@ -62,6 +68,8 @@ const PostListItem = withNavigation(
               <Avatar style={styles.avatar} user={post.user} size={48} />
             )}
             <BasePost
+              feed={showFeed && postCtx.feeds[feedId]}
+              showOptions={showOptions}
               style={showAvatar && { marignLeft: 0 }}
               post={post}
               onLike={onLike}

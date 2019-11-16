@@ -6,26 +6,33 @@ import { FriendsContext } from '../context/FriendsContext'
 import { AuthContext } from '../context/AuthContext'
 import Avatar from '../components/Avatar'
 import ScreenListItem from '../components/ScreenListItem'
-import PostListItemContainer from '../components/PostListItemContainer'
+import PostListItem from '../components/PostListItem'
 import Icon from '../components/Icon'
 import { PostContext } from '../context/PostContext'
+import { TouchableOpacity } from 'react-native-gesture-handler'
 
 function ProfileScreen({ navigation }) {
   // all contexts
   const authCtx = useContext(AuthContext)
   const friendsCtx = useContext(FriendsContext)
-  const { getProfile, profiles, posts } = useContext(PostContext)
+  const { fetchProfile, getProfile, profiles, posts } = useContext(PostContext)
+
   const id = navigation.getParam('id', authCtx.user ? authCtx.user.uid : null)
   const [requestSent, setRequestSent] = useState(null)
   const profile = profiles[id] ? profiles[id] : null
+
   useEffect(() => {
+    navigation.addListener('willFocus', () => fetchProfile(id))
     getProfile(id)
   }, [])
+
   async function getSentRequests() {
     const res = await authCtx.get('/friends/requests/sent')
     const requests = await res.json()
 
-    requests.includes(auth.user.uid) ? setRequestSent(true) : setRequestSent(false)
+    requests.includes(auth.user.uid)
+      ? setRequestSent(true)
+      : setRequestSent(false)
   }
 
   async function sendFriendRequest() {
@@ -44,13 +51,22 @@ function ProfileScreen({ navigation }) {
       {profile ? (
         <View style={{ flex: 1 }}>
           <View style={styles.header}>
-            <Avatar size={128} user={profile.user} />
+            <Avatar size={100} user={profile.user} />
             <View style={{ marginLeft: 32 }}>
               <Text style={styles.username}>{profile.user.username}</Text>
               {profile.relationship !== 'other' ? (
-                <Text style={{ fontWeight: 'bold' }} onPress={() => navigation.push('Friends')}>
-                  Friends {profile.user.friends.length}
-                </Text>
+                <TouchableOpacity
+                  onPress={() =>
+                    navigation.push('UserList', {
+                      users: profile.user.friends,
+                      title: 'Friends'
+                    })
+                  }
+                >
+                  <Text style={{ fontWeight: 'bold' }}>
+                    Friends {profile.user.friends.length}
+                  </Text>
+                </TouchableOpacity>
               ) : requestSent ? (
                 <Text title='Request sent'>Request Sent</Text>
               ) : (
@@ -61,7 +77,10 @@ function ProfileScreen({ navigation }) {
 
           {profile.relationship === 'self' && friendsCtx.requests.length > 0 && (
             <View style={{ paddingHorizontal: 22 }}>
-              <ScreenListItem onPress={() => navigation.navigate('FriendRequests')} text='Requests'>
+              <ScreenListItem
+                onPress={() => navigation.navigate('FriendRequests')}
+                text='Requests'
+              >
                 <Badge text={friendsCtx.requests.length} />
               </ScreenListItem>
             </View>
@@ -72,10 +91,19 @@ function ProfileScreen({ navigation }) {
               <FlatList
                 keyExtractor={item => item._id}
                 data={profile.posts}
-                renderItem={({ item }) => <PostListItemContainer post={posts[item._id]} />}
+                renderItem={({ item }) => (
+                  <PostListItem
+                    //showOptions={false}
+                    showFeed={true}
+                    postId={item._id}
+                    feedId={item.feed}
+                  />
+                )}
               />
             ) : (
-              <Text style={{ fontSize: 22, margin: 12 }}>There are no posts</Text>
+              <Text style={{ fontSize: 22, margin: 12 }}>
+                There are no posts
+              </Text>
             )
           ) : (
             <View
@@ -109,7 +137,7 @@ const styles = StyleSheet.create({
   header: {
     flexDirection: 'row',
     alignItems: 'center',
-    paddingHorizontal: 12,
+    padding: 12,
     paddingVertical: 24,
     borderBottomWidth: 1,
     borderBottomColor: 'lightgray'

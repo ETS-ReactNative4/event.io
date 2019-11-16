@@ -3,8 +3,10 @@ import { StyleSheet, View, Text } from 'react-native'
 import ToggleIcon from './ToggleIcon'
 import { TouchableOpacity } from 'react-native-gesture-handler'
 import { AuthContext } from '../context/AuthContext'
+import { withNavigation } from 'react-navigation'
 
 const PostListItemOptions = ({
+  navigation,
   post,
   comments,
   like,
@@ -37,7 +39,14 @@ const PostListItemOptions = ({
             name='heart'
             style={styles.icon}
           />
-          <Text style={styles.counter}>{computeLikes()}</Text>
+          <TouchableOpacity
+            onPress={() =>
+              post.likes.length > 0 &&
+              navigation.push('UserList', { users: post.likes, title: 'Likes' })
+            }
+          >
+            <Text style={styles.counter}>{computeLikes()}</Text>
+          </TouchableOpacity>
         </View>
         <View style={styles.iconContainer}>
           <ToggleIcon
@@ -57,7 +66,7 @@ const PostListItemOptions = ({
     </View>
   )
 }
-export default PostListItemOptions
+export default withNavigation(PostListItemOptions)
 
 const styles = StyleSheet.create({
   container: {
