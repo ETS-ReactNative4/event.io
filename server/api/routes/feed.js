@@ -10,27 +10,38 @@ router.get('/', tokenCheck, async (req, res) => {
   try {
     const user = await db.User.findById(req.user.uid)
     const { friends } = user
-    friends.push(user.id)
-    const feeds = await db.Feed.find({
-      $or: [
-        {
-          audience: 'public'
-        },
-        {
-          user: { $in: friends },
-          audience: 'friends'
-        },
-        {
-          user: { $in: friends },
-          audience: 'invite',
-          invites: req.user.uid
-        }
-      ]
-    })
-      .populate('user', '-email -password')
-      .sort({ _id: -1 })
-      .limit(25)
-    res.json(feeds)
+    if (!friends) {
+      const feeds = await db.Feed.find({ audience: 'public ' })
+        .populate('user', '-email -password')
+        .sort({ _id: -1 })
+      //.limit(25)
+      console.log('FEEEDS', feeds.length)
+      res.json(feeds)
+    } else {
+      friends.push(user.id)
+      const feeds = await db.Feed.find({
+        audience: 'public'
+        // $or: [
+        //   {
+        //     audience: 'public'
+        //   },
+        //   {
+        //     user: { $in: friends },
+        //     audience: 'friends'
+        //   },
+        //   {
+        //     user: { $in: friends },
+        //     audience: 'invite',
+        //     invites: req.user.uid
+        //   }
+        // ]
+      })
+        .populate('user', '-email -password')
+        .sort({ _id: -1 })
+      //.limit(25)
+      console.log('FEEEDS', feeds.length)
+      res.json(feeds)
+    }
   } catch (err) {
     console.log(err)
     res.status(500).end()
@@ -41,22 +52,19 @@ router.get('/', tokenCheck, async (req, res) => {
 router.post('/', tokenCheck, async (req, res) => {
   try {
     const { location, audience, title, description } = req.body
-    mapService.geocodeReverse(location, async mapquestData => {
-      const feed = await db.Feed.create({
-        user: req.user.uid,
-        location,
-        address: mapquestData.street,
-        audience,
-        title,
-        description
-      })
-      feed.populate('user', (err, doc) => {
-        if (err) {
-          res.status(500).end()
-        } else {
-          res.status(201).json(doc)
-        }
-      })
+    const feed = await db.Feed.create({
+      user: req.user.uid,
+      location,
+      audience,
+      title,
+      description
+    })
+    feed.populate('user', (err, doc) => {
+      if (err) {
+        res.status(500).end()
+      } else {
+        res.status(201).json(doc)
+      }
     })
   } catch (err) {
     res.status(500).end()

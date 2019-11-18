@@ -4,19 +4,23 @@ import { View, Text } from 'react-native'
 import { FlatList } from 'react-navigation'
 import PostListItem from '../components/PostListItem'
 import Search from '../components/Search'
+import { AuthContext } from '../context/AuthContext'
 
 HomeScreen.navigationOptions = {
   title: 'Home'
 }
 export default function HomeScreen({ navigation }) {
   const postCtx = useContext(PostContext)
+  const auth = useContext(AuthContext)
   const [posts, setPosts] = useState([])
   const [refreshing, setRefreshing] = useState(false)
 
   useEffect(() => {
-    fetchHome()
-    navigation.addListener('willFocus', fetchHome)
-  }, [])
+    if (auth.user && auth.user.uid) {
+      fetchHome()
+      navigation.addListener('willFocus', fetchHome)
+    }
+  }, [auth])
 
   function EmptyList() {
     return (

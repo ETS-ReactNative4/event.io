@@ -1,11 +1,11 @@
-import React from 'react';
-import Navigator from './screens';
+import React from 'react'
+import Navigator from './screens'
 class App extends React.Component {
   componentDidMount() {
-    console.disableYellowBox = true;
+    console.disableYellowBox = true
   }
   render() {
-    return <Navigator />;
+    return <Navigator />
   }
 }
-export default App;
+export default App

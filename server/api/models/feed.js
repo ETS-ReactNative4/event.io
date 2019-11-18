@@ -1,5 +1,7 @@
-const mongoose = require('mongoose')
+const mapService = require('../utils/mapService')
+const pexelsService = require('../utils/pexelsService')
 
+const mongoose = require('mongoose')
 const FeedSchema = new mongoose.Schema({
   user: {
     type: mongoose.SchemaTypes.ObjectId,
@@ -24,7 +26,7 @@ const FeedSchema = new mongoose.Schema({
   },
   audience: {
     type: String,
-    default: 'private',
+    default: 'public',
     required: true
   },
   invites: [
@@ -46,5 +48,15 @@ const FeedSchema = new mongoose.Schema({
     default: Date.now
   }
 })
+// Address
+FeedSchema.pre('save', function(next) {
+  if (this.isNew) {
+    mapService.geocodeReverse(this.location, async mapquestData => {
+      this.address = mapquestData.street
+      next()
+    })
+  }
+})
+// Picture
 
 module.exports = mongoose.model('Feed', FeedSchema)

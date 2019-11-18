@@ -27,7 +27,10 @@ router.post('/refresh', async (req, res) => {
 router.post('/login', async (req, res) => {
   const { email, password } = req.body
   const user = await db.User.findOne({ email })
-  if (!user) return unauthorized(res)
+  if (!user) {
+    console.log('No user found')
+    return unauthorized(res)
+  }
 
   bcrypt.compare(password, user.password, (err, same) => {
     if (err || !same) return unauthorized(res)
@@ -48,28 +51,17 @@ router.post('/register', async (req, res) => {
   const { email, password, username } = req.body
   const userExists = await db.User.findOne({ email })
   if (userExists) return res.status(304).end()
-  bcrypt.hash(password, 10, async (err, hash) => {
-    if (err) {
-      return res.status(500).end()
-    } else {
-      try {
-        const user = await db.User.create({
-          username,
-          email,
-          password: hash,
-          picture: `https://fakeimg.pl/100x100/333/?text=${username[0].toUpperCase()}&font=noto`,
-          friends: []
-        })
-        res.json({
-          username: user.username,
-          email: user.email,
-          picture: user.picture
-        })
-      } catch (err) {
-        console.log(err)
-        res.status(400).end()
-      }
-    }
+  const user = await db.User.create({
+    username,
+    email,
+    password,
+    friends: []
+  })
+  res.json({
+    _id: user._id,
+    username: user.username,
+    email: user.email,
+    picture: user.picture
   })
 })
 

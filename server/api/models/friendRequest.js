@@ -13,8 +13,7 @@ const FriendRequestSchema = new mongoose.Schema({
   },
   accepted: {
     type: Boolean,
-    default: null,
-    required: true
+    default: null
   },
   closed: {
     type: Boolean,

@@ -1,6 +1,7 @@
 import React from 'react'
 import FeedItem from './FeedItem'
-import { View, Text, FlatList } from 'react-native'
+import { FlatList } from 'react-navigation'
+import { View, Text } from 'react-native'
 
 export default function FeedList(props) {
   const EmptyList = () => {

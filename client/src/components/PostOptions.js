@@ -5,7 +5,7 @@ import { TouchableOpacity } from 'react-native-gesture-handler'
 import { AuthContext } from '../context/AuthContext'
 import { withNavigation } from 'react-navigation'
 
-const PostListItemOptions = ({
+const PostOptions = ({
   navigation,
   post,
   comments,
@@ -18,7 +18,7 @@ const PostListItemOptions = ({
   const auth = useContext(AuthContext)
 
   function computeLikes() {
-    const initialLike = post.likes.includes(auth.user.uid)
+    const initialLike = auth.user ? post.likes.includes(auth.user.uid) : false
     return initialLike
       ? like
         ? post.likes.length
@@ -66,7 +66,7 @@ const PostListItemOptions = ({
     </View>
   )
 }
-export default withNavigation(PostListItemOptions)
+export default withNavigation(PostOptions)
 
 const styles = StyleSheet.create({
   container: {

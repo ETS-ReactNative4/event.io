@@ -13,7 +13,7 @@ export const PostProvider = props => {
   const auth = useContext(AuthContext)
 
   useEffect(() => {
-    if (auth.user) {
+    if (auth.user && auth.user.uid) {
       fetchFeeds()
       fetchProfile(auth.user.uid)
     }
@@ -22,6 +22,7 @@ export const PostProvider = props => {
   async function fetchHome() {
     try {
       const res = await auth.get('/home')
+      console.log(res)
       const homePosts = await res.json()
       for (let post of homePosts) {
         posts[post._id] = post

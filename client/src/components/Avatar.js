@@ -1,12 +1,13 @@
-import React from 'react';
-import { Image } from 'react-native';
+import React from 'react'
+import { Image } from 'react-native'
 
-export default function Avatar({ rounded = true, user, size, style }) {
-  const imgSource =
-    user.picture ||
-    `https://fakeimg.pl/${size}x${size}/333/?text=${user.username[0].toUpperCase()}&font=noto`;
+export default function Avatar({ rounded = true, picture, user, size, style }) {
+  const imgSource = picture
+    ? picture
+    : user.picture ||
+      `https://fakeimg.pl/${size}x${size}/333/?text=${user.username[0].toUpperCase()}&font=noto`
 
-  const radius = rounded ? 100 : 6;
+  const radius = rounded ? 100 : 6
   return (
     <Image
       width={size}
@@ -14,5 +15,5 @@ export default function Avatar({ rounded = true, user, size, style }) {
       style={[{ width: size, height: size, borderRadius: radius }, style]}
       source={{ uri: imgSource }}
     />
-  );
+  )
 }

@@ -17,7 +17,12 @@ function FeedItem({ navigation, feed }) {
           borderBottomColor: 'lightgray'
         }}
       >
-        <Avatar rounded={false} size={64} user={feed.user} />
+        <Avatar
+          rounded={false}
+          size={64}
+          user={feed.user}
+          picture={feed.thumbnail}
+        />
         <View style={{ flex: 1 }}>
           <View style={{ marginLeft: 12 }}>
             <Text

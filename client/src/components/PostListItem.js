@@ -22,22 +22,24 @@ const PostListItem = withNavigation(
   }) => {
     const postCtx = useContext(PostContext)
     const authCtx = useContext(AuthContext)
-    const post = postCtx.posts && postCtx.posts[postId]
-    const [comments, setComments] = useState()
+    const [comments, setComments] = useState(null)
     const [commentToggle, setCommentToggle] = useState(false)
-    const [likeToggle, setLikeToggle] = useState(
-      post && post.likes.includes(authCtx.user.uid)
-    )
+    const [likeToggle, setLikeToggle] = useState(false)
+    const post = postCtx.posts && postCtx.posts[postId]
+
+    useEffect(() => {
+      post && setLikeToggle(post.likes.includes(authCtx.user.uid))
+    }, [post])
 
     const onLike = like => {
       setLikeToggle(like)
       postCtx.setLikePost(postId, like)
     }
+
     const onReply = () => {
-      if (post) {
-        navigation.push('Post', { post: post })
-      }
+      post && navigation.push('Post', { post })
     }
+
     const onComment = async () => {
       if (!post.comments || post.comments.length === 0) return
       const data = await postCtx.getPosts(feedId, postId)

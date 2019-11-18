@@ -48,14 +48,21 @@ export default function ExploreScreen({ navigation }) {
           longitudeDelta: 0.03
         }}
         showsBuildings={false}
+        showsPointsOfInterest={true}
+        followsUserLocation={true}
+        mapType='mutedStandard'
+        onUserLocationChange={e => {
+          console.log(e)
+        }}
+        showsUserLocation={true}
         pitchEnabled={false}
       >
-        <Circle
+        {/* <Circle
           radius={1000}
           center={position}
           strokeColor={'white'}
           fillColor={'rgba(200,200,248,0.5)'}
-        />
+        /> */}
         {feeds &&
           _.toArray(feeds).map(feed => {
             return (

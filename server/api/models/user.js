@@ -1,4 +1,5 @@
 const mongoose = require('mongoose')
+const bcrypt = require('bcrypt')
 
 const UserSchema = new mongoose.Schema({
   username: {
@@ -17,8 +18,7 @@ const UserSchema = new mongoose.Schema({
     required: true
   },
   picture: {
-    type: String,
-    required: true
+    type: String
   },
   friends: [
     {
@@ -28,5 +28,19 @@ const UserSchema = new mongoose.Schema({
   ]
 })
 
+UserSchema.pre('save', function(next) {
+  if (this.isNew) {
+    if (!this.picture) {
+      this.picture = `https://fakeimg.pl/100x100/333/?text=${this.username[0].toUpperCase()}&font=noto`
+    }
+    bcrypt.hash(this.password, 10, (err, encrypted) => {
+      if (err) throw err
+      this.password = encrypted
+      next()
+    })
+  } else {
+    next()
+  }
+})
 const User = mongoose.model('User', UserSchema)
 module.exports = User

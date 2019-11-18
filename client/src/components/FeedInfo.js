@@ -3,7 +3,7 @@ import { View, Text, TouchableOpacity, LayoutAnimation } from 'react-native'
 import Avatar from './Avatar'
 
 export default function FeedInfo({ feed }) {
-  const [showDescription, setShowDescription] = useState(false)
+  const [showDescription, setShowDescription] = useState(true)
 
   function toggleDescription() {
     LayoutAnimation.easeInEaseOut()
@@ -24,7 +24,12 @@ export default function FeedInfo({ feed }) {
         }}
       >
         <View style={{ justifyContent: 'center', alignItems: 'center' }}>
-          <Avatar size={100} rounded={false} user={feed.user} />
+          <Avatar
+            size={100}
+            rounded={false}
+            user={feed.user}
+            picture={feed.thumbnail}
+          />
         </View>
         <View style={{ flex: 1, marginLeft: 22 }}>
           <Text style={{ fontSize: 16, marginBottom: 6 }}>{feed.title}</Text>

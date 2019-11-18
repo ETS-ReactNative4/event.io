@@ -88,8 +88,6 @@ router.put('/requests/:id', tokenCheck, async (req, res) => {
     }
     // documents reciepient is not user
     if (friendRequest.to.toString() !== req.user.uid.toString()) {
-      console.log('no match')
-      console.log(friendRequest.to, req.user.uid)
       return res.status(401).end()
     }
     // update documents in database

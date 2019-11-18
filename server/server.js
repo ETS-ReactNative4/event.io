@@ -9,7 +9,6 @@ const jwt = require('jsonwebtoken')
 const PORT = process.env.PORT || 3000
 const MONGO_URI =
   process.env.MONGODB_URI || 'mongodb://127.0.0.1/hidden-notes'
-
 var socketConnections = {}
 app.use(express.urlencoded({ extended: true }))
 app.use(express.json())
