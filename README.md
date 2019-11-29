@@ -2,9 +2,9 @@
 
 A social media iOS and Android application built with React-Native. Event-io allow users to create localized event feeds to which others can post, like, and share their activities.
 
-<img width=256 src="./screenshots/home.png"/>
-<img width=256 src="./screenshots/navigate.png"/>
-<img width=256 src="./screenshots/profile.png"/>
+<img width=512 src="./screenshots/home.png"/>
+<img width=512 src="./screenshots/navigate.png"/>
+<img width=512 src="./screenshots/profile.png"/>
 
 ## Environment
 
