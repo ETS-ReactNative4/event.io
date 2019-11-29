@@ -2,13 +2,6 @@
 
 A social media iOS and Android application built with React-Native. Event-io allow users to create localized event feeds to which others can post, like, and share their activities.
 
-<div style="display: flex; flex-wrap: wrap">
-<img width=384 src="./screenshots/home.png"/>
-<img width=384 src="./screenshots/feed.png"/>
-<img width=384 src="./screenshots/navigate.png"/>
-<img width=384 src="./screenshots/profile.png"/>
-</div>
-
 ## Environment
 
 1. Event-io makes use of the Mapquest's Geocoding API. You will need to visit their website at https://developer.mapquest.com to sign up and recieve an API key.
@@ -33,3 +26,12 @@ A social media iOS and Android application built with React-Native. Event-io all
 - To begin emulation on your desired platform, make sure you are in the client folder and execute the command `yarn run ios` or `yarn run android` from the command line.
 
 - You may wish to seed the database. Simply run `npm run seed` from the server directory to accomplish this.
+
+## Screenshots
+
+<div style="display: flex; flex-wrap: wrap">
+<img width=384 src="./screenshots/home.png"/>
+<img width=384 src="./screenshots/feed.png"/>
+<img width=384 src="./screenshots/navigate.png"/>
+<img width=384 src="./screenshots/profile.png"/>
+</div>
