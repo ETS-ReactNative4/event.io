@@ -85,6 +85,7 @@ export class AuthProvider extends Component {
       }
     },
     login: async (email, password) => {
+      console.log(email, password)
       const res = await fetch(`${baseUrl}/auth/login`, {
         method: 'POST',
         headers: {
