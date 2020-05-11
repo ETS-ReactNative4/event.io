@@ -12,5 +12,7 @@ module.exports = {
   decode(token) {
     return jwt.verify(token, appconfig.API_KEY)
   },
-  compareHash(original, hash) {},
+  async compareHash(original, hash) {
+    return await bcrypt.compare(original, hash)
+  },
 }
