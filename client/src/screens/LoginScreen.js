@@ -8,7 +8,6 @@ import {
   KeyboardAvoidingView
 } from 'react-native'
 import { AuthContext } from '../context/AuthContext'
-import FadeIn from '../components/animated/FadeIn'
 import LoginForm from '../components/LoginForm'
 import RegisterForm from '../components/RegisterForm'
 
@@ -24,6 +23,7 @@ class LoginScreen extends Component {
 
   login = async (email, pass) => {
     const success = await this.context.login(email, pass)
+
     success
       ? this.props.navigation.navigate('App')
       : Alert.alert('Unauthorized', 'Email or password are incorrenct')
