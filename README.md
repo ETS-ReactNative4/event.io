@@ -28,8 +28,8 @@ A social media iOS and Android application built with React-Native. Event-io all
 - You may wish to seed the database. Simply run `npm run seed` from the server directory to accomplish this.
 
 <div style="display: flex; flex-wrap: wrap">
-  <img width=384 src="./screenshots/home.png"/>
-  <img width=384 src="./screenshots/feed.png"/>
-  <img width=384 src="./screenshots/navigate.png"/>
-  <img width=384 src="./screenshots/profile.png"/>
+  <img width=256 src="./screenshots/home.png"/>
+  <img width=256 src="./screenshots/feed.png"/>
+  <img width=256 src="./screenshots/navigate.png"/>
+  <img width=256 src="./screenshots/profile.png"/>
 </div>
