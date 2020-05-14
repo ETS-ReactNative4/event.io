@@ -7,39 +7,32 @@ import {
   Alert,
   KeyboardAvoidingView
 } from 'react-native'
-import { AuthContext } from '../context/AuthContext'
 import LoginForm from '../components/LoginForm'
 import RegisterForm from '../components/RegisterForm'
+import { useAuth } from '../hooks/useAuth'
 
-function LoginScreen() {
-  const authContext = useContext(AuthContext)
+function LoginScreen({ navigation }) {
+  const auth = useAuth()
+  const [loginFormDisplay, setLoginFormDisplay] = useState(true)
 
-  login = async (email, pass) => {
-    const success = await authContext.login(email, pass)
-
-    success
-      ? this.props.navigation.navigate('App')
-      : Alert.alert('Unauthorized', 'Email or password are incorrenct')
+  const handleLogin = async (email, pass) => {
+    const success = await auth.login(email, pass)
+    if (success) {
+      navigation.navigate('App')
+    } else {
+      Alert.alert('Unauthorized', 'Email or password are incorrenct')
+    }
   }
 
-  register = async (email, password, username) => {
-    const res = await fetch('http://localhost:3000/auth/register', {
-      headers: {
-        'content-type': 'application/json'
-      },
-      method: 'post',
-      body: JSON.stringify({
-        email,
-        password,
-        username
-      })
-    })
-    res.ok ? this.toggleLogin() : Alert.alert('Error Registering')
+  const handleRegister = async (email, password, username) => {
+    const success = await auth.register(email, password, username)
+    success ? toggleLoginDisplay() : Alert.alert('Error Registering')
   }
 
-  toggleLogin = () => {
+  // moves between register and login form
+  const toggleLoginDisplay = () => {
     LayoutAnimation.easeInEaseOut()
-    this.setState({ login: !this.state.login })
+    setLoginFormDisplay(!loginFormDisplay)
   }
 
   return (
@@ -56,18 +49,18 @@ function LoginScreen() {
       >
         <View style={{ marginLeft: '12.5%', width: '75%' }}>
           <Text style={{ color: 'white', fontSize: 32, marginBottom: 32 }}>
-            {this.state.login ? 'Sign in' : 'Sign up'}
+            {loginFormDisplay ? 'Sign in' : 'Sign up'}
           </Text>
         </View>
         {this.state.login ? (
           <LoginForm
-            onLogin={this.login}
-            onNavigateToRegister={this.toggleLogin}
+            onLogin={handleLogin}
+            onNavigateToRegister={toggleLoginDisplay}
           />
         ) : (
           <RegisterForm
-            onRegister={this.register}
-            onNavigateToLogin={this.toggleLogin}
+            onRegister={handleRegister}
+            onNavigateToLogin={toggleLoginDisplay}
           />
         )}
       </ScrollView>

@@ -1,127 +1,20 @@
-import React, { useState, useContext, useEffect } from 'react'
-import { AuthContext } from './AuthContext'
-import Geolocation from '@react-native-community/geolocation'
+import React, { useState, createContext, useContext, useEffect } from 'react'
 import _ from 'lodash'
 
-export const PostContext = React.createContext()
+export const PostContext = createContext({
+  feeds: null,
+  setFeeds: feeds => {},
+  posts: null,
+  setPosts: posts => {},
+  profiles: null,
+  setProfiles: profiles => {}
+})
+
 export const PostProvider = props => {
-  // state
   const [feeds, setFeeds] = useState(null)
   const [posts, setPosts] = useState({})
   const [profiles, setProfiles] = useState(null)
-  // context
-  const auth = useContext(AuthContext)
 
-  useEffect(() => {
-    if (auth.user && auth.user.uid) {
-      fetchFeeds()
-      fetchProfile(auth.user.uid)
-    }
-  }, [auth])
-
-  async function fetchHome() {
-    try {
-      const res = await auth.get('/home')
-      console.log(res)
-      const homePosts = await res.json()
-      for (let post of homePosts) {
-        posts[post._id] = post
-      }
-      setPosts({ ...posts })
-      console.log(JSON.stringify(homePosts, null, 2))
-      return homePosts
-    } catch (err) {
-      console.log('Error:fetchHome', err)
-      return null
-    }
-  }
-
-  // FEEDS fetch -> create
-  async function fetchFeeds() {
-    try {
-      const res = await auth.get('/feed')
-      if (res.ok) {
-        const data = await res.json()
-        const newFeeds = {}
-        for (const feed of data) {
-          newFeeds[feed._id] = feed
-        }
-        setFeeds(newFeeds)
-        return data
-      }
-    } catch (err) {
-      console.log('Error::PostContext::fetchFeed', err)
-      return null
-    }
-  }
-
-  async function fetchFeed(feedId) {
-    try {
-      const res = await auth.get(`/feed/${feedId}`)
-      if (res.ok) {
-        const data = await res.json()
-        const newPosts = {}
-        for (let post of data.posts) {
-          newPosts[post._id] = post
-        }
-        if (posts) {
-          setPosts({ ...posts, ...newPosts })
-        } else {
-          setPosts({ ...newPosts })
-        }
-        return data
-      } else {
-        console.log(
-          'Error::PostContext::fetchFeed\nError fetching feed from server'
-        )
-        return null
-      }
-    } catch (err) {
-      console.log(err)
-      return null
-    }
-  }
-
-  async function createFeed(feed) {
-    try {
-      Geolocation.getCurrentPosition(
-        async pos => {
-          const { audience, title, description } = feed
-          const location = {
-            latitude: pos.coords.latitude + (Math.random() - 0.5) * 0.05,
-            longitude: pos.coords.longitude + (Math.random() - 0.5) * 0.05
-          }
-          const res = await auth.get('/feed', {
-            method: 'post',
-            headers: {
-              'Content-Type': 'application/json'
-            },
-            body: JSON.stringify({ title, description, audience, location })
-          })
-          if (res.ok) {
-            const createdFeed = await res.json()
-            setFeeds({ [createdFeed._id]: createdFeed, ...feeds })
-            return createdFeed
-          } else {
-            console.log(
-              'Error creating feed. Server responded with status code',
-              res
-            )
-            return null
-          }
-        },
-        err => {
-          console.log('Geolocation error in createFeed', err)
-          return null
-        }
-      )
-    } catch (err) {
-      console.log('Error::PostContext::createFeed', err)
-      return null
-    }
-  }
-
-  // Returns cached post fetching as default
   async function getPosts(feedId, postId) {
     try {
       if (!posts) return await fetchPosts(feedId, postId)
@@ -268,22 +161,11 @@ export const PostProvider = props => {
   return (
     <PostContext.Provider
       value={{
-        fetchHome,
-        // feeds
         feeds,
-        fetchFeeds,
-        fetchFeed,
-        createFeed,
-        // posts
+        setFeeds,
         posts,
-        fetchPosts,
-        getPosts,
-        createPost,
-        setLikePost,
-        // profile
+        setPosts,
         profiles,
-        fetchProfile,
-        getProfile,
         setProfiles
       }}
     >

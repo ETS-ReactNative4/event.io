@@ -1,10 +1,13 @@
 import { useContext } from 'react'
 import AsyncStorage from '@react-native-community/async-storage'
+import { useApi } from './useApi'
+import { AuthContext } from '../context/AuthContext'
 
 export function useAuth() {
-  const ctx = useContext(AuthContext)
+  const authctx = useContext(AuthContext)
+  const api = useApi()
 
-  const removeTokenFromStorage = async () => {
+  const removeStorageToken = async () => {
     try {
       await AsyncStorage.removeItem('token')
     } catch (err) {
@@ -12,7 +15,7 @@ export function useAuth() {
     }
   }
 
-  const getTokenFromStorage = async () => {
+  const getStorageToken = async () => {
     try {
       const token = await AsyncStorage.getItem('token')
       return token
@@ -25,7 +28,7 @@ export function useAuth() {
     }
   }
 
-  const saveTokenToStorage = async token => {
+  const saveStorageToken = async token => {
     try {
       await AsyncStorage.setItem('token', token)
       return true
@@ -39,25 +42,15 @@ export function useAuth() {
   }
 
   const refreshToken = async token => {
-    const response = await fetch(`${baseUrl}/auth/refresh`, {
-      method: 'post',
-      headers: {
-        'Content-Type': 'application/json'
-      },
-      body: JSON.stringify({ token: token })
-    })
-    if (response.ok) {
+    const res = await api.post('/auth/token', { token })
+    if (res.ok) {
       try {
-        const data = await response.json()
-        await saveTokenToStorage(data.token)
+        const data = await res.json()
         const socket = io(baseUrl)
+        await saveStorageToken(data.token)
         socket.emit('authenticate', { token: data.token })
-
-        ctx.setState({
-          token: data.token,
-          user: data.user,
-          socket
-        })
+        authctx.setToken(data.token)
+        authctx.setUser(data.user)
         return true
       } catch (err) {
         console.log(err)
@@ -67,26 +60,25 @@ export function useAuth() {
       return false
     }
   }
-  const login = async (email, password) => {
-    const res = await fetch(`${baseUrl}/auth/login`, {
-      method: 'POST',
-      headers: {
-        'content-type': 'application/json'
-      },
-      body: JSON.stringify({ email, password })
-    })
 
+  const register = async (email, password, username) => {
+    const res = await api.post('/auth/register', { email, password, username })
+    return res.ok
+  }
+
+  const login = async (email, password) => {
+    const res = await api.post('/auth/login', { email, password })
     if (res.ok) {
       const data = await res.json()
-      const success = await saveTokenToStorage(data.token)
+      const success = await saveStorageToken(data.token)
       if (!success) {
         console.log('Error saving token', error)
         return false
       } else {
-        // logged in successfully now connect to socket
         const socket = io(baseUrl)
         socket.emit('authenticate', { token: data.token })
-        this.setState({ token: data.token, user: data.user, socket })
+        authctx.setToken(data.token)
+        authctx.setUser(data.user)
         return true
       }
     } else {
@@ -96,9 +88,13 @@ export function useAuth() {
   }
 
   const logout = async () => {
-    this.state.socket.removeAllListeners()
-    this.state.socket.disconnect()
-    await AsyncStorage.removeItem('token')
-    this.setState({ token: null, user: null, socket: null })
+    authctx.socket.removeAllListeners()
+    authctx.socket.disconnect()
+    await removeStorageToken()
+    authctx.setUser(null)
+    authctx.setToken(null)
+    authctx.setSocket(null)
   }
+
+  return { register, login, logout, refreshToken }
 }
