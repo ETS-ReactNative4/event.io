@@ -1,84 +1,99 @@
 import { useContext } from 'react'
 import { PostContext } from '../context/PostContext'
-import Geolocation from '@react-native-community/geolocation'
 import { useApi } from '../hooks/useApi'
+import { tryCatch } from '../util/err'
 
 export default function usePosts() {
   const api = useApi()
   const postctx = useContext(PostContext)
 
   async function fetchHomePosts() {
-    try {
+    const [data, err] = await tryCatch(async () => {
       const res = await api.get('/home')
-      const homePosts = await res.json()
+      homePosts = await res.json()
       const posts = postctx.posts
-      // cache could lead to mem leak
       for (let post of homePosts) {
         posts[post._id] = post
       }
       postctx.setPosts(posts)
       return homePosts
-    } catch (err) {
-      console.log('Error:fetchHome', err)
-      return null
-    }
+    })
+    return data
   }
 
-  // maybe different ctx
-  async function createFeed(feed) {
-    try {
-      Geolocation.getCurrentPosition(
-        async pos => {
-          const { audience, title, description } = feed
-          const location = {
-            latitude: pos.coords.latitude,
-            longitude: pos.coords.longitude
-          }
-          const res = await api.post('/feed', {
-            title,
-            description,
-            audience,
-            location
-          })
-          if (res.ok) {
-            const createdFeed = await res.json()
-            postctx.setFeeds({ [createdFeed._id]: createdFeed, ...feeds })
-            return createdFeed
-          } else {
-            console.log(
-              'Error creating feed. Server responded with status code',
-              res.code
-            )
-            return null
-          }
-        },
-        err => {
-          console.log('Geolocation error in createFeed', err)
-          return null
-        }
-      )
-    } catch (err) {
-      console.log('Error::PostContext::createFeed', err)
-      return null
-    }
-  }
-
-  async function fetchFeeds() {
-    try {
-      const res = await api.get('/feed')
+  async function fetchPosts(feedId, postId) {
+    const [data, err] = await tryCatch(async () => {
+      const res = await auth.get(`/feed/${feedId}/${postId}`)
       if (res.ok) {
         const data = await res.json()
-        const newFeeds = {}
-        for (const feed of data) {
-          newFeeds[feed._id] = feed
-        }
-        postctx.setFeeds(newFeeds)
+        posts[data.post._id] = data.post
+        if (data.comments && data.comments.length > 0)
+          for (let post of data.comments) {
+            posts[post._id] = post
+          }
+        setPosts(posts)
         return data
       }
-    } catch (err) {
-      console.log('Error::PostContext::fetchFeed', err)
-      return null
-    }
+    })
+    return data
+  }
+
+  async function setLike(postid, like) {
+    const [data, err] = await tryCatch(async () => {
+      const res = await api.post(`/posts/${postid}/likes`, { like })
+      if (res.ok) {
+        const data = await res.json()
+        postctx.setPosts({ ...posts, [postid]: data })
+        return data
+      }
+    })
+    return data
+  }
+
+  async function createPost(feedId, body, postId) {
+    const [data, err] = await tryCatch(async () => {
+      const url = postId ? `/feed/${feedId}/${postId}` : `/feed/${feedId}`
+      const res = await api.post(url, body)
+      if (res.ok) {
+        const data = await res.json()
+        if (!postId) {
+          feeds[data.feed._id] = data.feed
+          posts[data.post._id] = data.post
+          setFeeds({ ...feeds })
+          setPosts({ ...posts })
+        } else {
+          posts[data.post._id] = data.post
+          posts[data.parent._id] = data.parent
+          setPosts({ ...posts })
+        }
+        return data
+      }
+    })
+    return data
+  }
+
+  async function getPosts(feedId, postId) {
+    const [data, err] = await tryCatch(async () => {
+      if (!postctx.posts) {
+        return await fetchPosts(feedId, postId)
+      }
+      const post = postctx.posts[postId]
+      if (!post) {
+        return await fetchPosts(feedId, postId)
+      } else {
+        const out = {}
+        for (let commentId of post.comments) {
+          const comment = postctx.posts[commentId]
+          if (!comment) {
+            return await fetchPosts(feedId, postId)
+          } else {
+            out[comment._id] = comment
+          }
+          return { post, comments: out }
+        }
+      }
+    })
+    return data
   }
 
   async function fetchFeedById(feedId) {
@@ -104,5 +119,5 @@ export default function usePosts() {
     }
   }
 
-  return { fetchHomePosts, fetchFeeds, fetchFeedById }
+  return { fetchHomePosts, fetchFeedById }
 }

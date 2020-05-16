@@ -2,6 +2,7 @@ import { useContext } from 'react'
 import AsyncStorage from '@react-native-community/async-storage'
 import { useApi } from './useApi'
 import { AuthContext } from '../context/AuthContext'
+import { appconfig } from '../appconfig'
 
 export function useAuth() {
   const authctx = useContext(AuthContext)
@@ -41,14 +42,16 @@ export function useAuth() {
     }
   }
 
-  const refreshToken = async token => {
+  const loginWithToken = async token => {
+    const token = await getStorageToken()
     const res = await api.post('/auth/token', { token })
     if (res.ok) {
       try {
         const data = await res.json()
-        const socket = io(baseUrl)
+        const socket = io(appconfig.BACKEND_URL)
         await saveStorageToken(data.token)
         socket.emit('authenticate', { token: data.token })
+        authctx.setSocket(socket)
         authctx.setToken(data.token)
         authctx.setUser(data.user)
         return true
@@ -96,5 +99,5 @@ export function useAuth() {
     authctx.setSocket(null)
   }
 
-  return { register, login, logout, refreshToken }
+  return { register, login, logout, loginWithToken }
 }
