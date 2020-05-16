@@ -1,14 +1,12 @@
-import React, { useState, createContext, useContext, useEffect } from 'react'
-import _ from 'lodash'
+import React, { useState, createContext } from 'react'
 
 export const PostContext = createContext({
-  posts: null,
-  setPosts: posts => {}
+  posts: {},
+  setPosts: ({}) => {}
 })
 
-export const PostProvider = props => {
+export const PostProvider = (props: any) => {
   const [posts, setPosts] = useState({})
-
   return (
     <PostContext.Provider
       value={{

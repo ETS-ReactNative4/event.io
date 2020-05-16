@@ -3,6 +3,7 @@ import AsyncStorage from '@react-native-community/async-storage'
 import { useApi } from './useApi'
 import { AuthContext } from '../context/AuthContext'
 import { appconfig } from '../appconfig'
+import { Socket } from 'socket.io-client'
 
 export function useAuth() {
   const authctx = useContext(AuthContext)
@@ -29,7 +30,7 @@ export function useAuth() {
     }
   }
 
-  const saveStorageToken = async token => {
+  const saveStorageToken = async (token: string) => {
     try {
       await AsyncStorage.setItem('token', token)
       return true
@@ -42,7 +43,7 @@ export function useAuth() {
     }
   }
 
-  const loginWithToken = async token => {
+  const loginWithToken = async () => {
     const token = await getStorageToken()
     const res = await api.post('/auth/token', { token })
     if (res.ok) {
@@ -64,21 +65,25 @@ export function useAuth() {
     }
   }
 
-  const register = async (email, password, username) => {
+  const register = async (
+    email: string,
+    password: string,
+    username: string
+  ) => {
     const res = await api.post('/auth/register', { email, password, username })
     return res.ok
   }
 
-  const login = async (email, password) => {
+  const login = async (email: string, password: string) => {
     const res = await api.post('/auth/login', { email, password })
     if (res.ok) {
       const data = await res.json()
       const success = await saveStorageToken(data.token)
       if (!success) {
-        console.log('Error saving token', error)
+        console.log('Error saving token')
         return false
       } else {
-        const socket = io(baseUrl)
+        const socket = io(appconfig.BACKEND_URL)
         socket.emit('authenticate', { token: data.token })
         authctx.setToken(data.token)
         authctx.setUser(data.user)
@@ -95,8 +100,8 @@ export function useAuth() {
     authctx.socket.disconnect()
     await removeStorageToken()
     authctx.setUser(null)
-    authctx.setToken(null)
-    authctx.setSocket(null)
+    authctx.setToken('')
+    authctx.setSocket(Socket)
   }
 
   return { register, login, logout, loginWithToken }

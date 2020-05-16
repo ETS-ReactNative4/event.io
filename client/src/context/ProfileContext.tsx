@@ -2,11 +2,11 @@ import React, { useState, createContext } from 'react'
 
 export const ProfilesContext = createContext({
   profiles: {},
-  setProfiles: () => {}
+  setProfiles: (obj: Object) => {}
 })
 
-export const ProfilesProvider = ({ children }) => {
-  const [profiles, setProfiles] = useState([])
+export const ProfilesProvider = (props: any) => {
+  const [profiles, setProfiles] = useState({})
   return (
     <ProfilesContext.Provider
       value={{
@@ -14,7 +14,7 @@ export const ProfilesProvider = ({ children }) => {
         setProfiles
       }}
     >
-      {children}
+      {props.children}
     </ProfilesContext.Provider>
   )
 }

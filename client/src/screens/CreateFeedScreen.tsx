@@ -1,4 +1,5 @@
 import React, { useState, useContext } from 'react'
+import { useFeeds } from '../hooks/useFeeds'
 import {
   StyleSheet,
   View,
@@ -17,7 +18,8 @@ CreateFeedScreen.navigationOptions = {
 }
 export default function CreateFeedScreen({ navigation }) {
   const postCtx = useContext(PostContext)
-  const [title, setTitle] = useState('')
+
+  posts.const[(title, setTitle)] = useState('')
   const [description, setDescription] = useState('')
   const [isPublic, setPublic] = useState(false)
 
@@ -53,7 +55,7 @@ export default function CreateFeedScreen({ navigation }) {
               borderBottomWidth: 1,
               borderBottomColor: 'lightgray'
             }}
-          ></View>
+          />
         </View>
       )}
       <KeyboardAvoidingView behavior='padding' style={{ flex: 1 }}>

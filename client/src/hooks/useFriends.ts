@@ -3,14 +3,14 @@ import { FriendsContext } from '../context/FriendsContext'
 import { useApi } from './useApi'
 
 export default function useFriends() {
-  const friendsctx = useContext(FriendsContext)
+  const cache = useContext(FriendsContext)
   const api = useApi()
 
   async function fetchFriendRequests() {
     try {
       const res = await api.get('/friends/requests')
       const requests = await res.json()
-      firendsctx.setFriendRequests(requests)
+      cache.setFriendRequests(requests)
     } catch (err) {
       console.log(err)
     }
@@ -20,7 +20,7 @@ export default function useFriends() {
     try {
       const res = await api.get('/friends')
       const data = await res.json()
-      friendsctx.setFriends(data.friends)
+      cache.setFriends(data.friends)
     } catch (err) {
       console.log(err)
     }

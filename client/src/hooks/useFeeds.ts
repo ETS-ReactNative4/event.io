@@ -1,14 +1,15 @@
 import { useApi } from './useApi'
 import { useContext } from 'react'
-import { FeedsContext } from '../context/FeedsContext'
+import { FeedContext, FeedCache } from '../context/FeedsContext'
 import { tryCatch } from '../util/err'
 import { getPosition } from '../util/geo'
+import { IFeed } from '../interfaces/IFeed'
 
 export default function useFeeds() {
   const api = useApi()
-  const feedsctx = useContext(FeedsContext)
+  const cache = useContext(FeedContext)
 
-  async function createFeed(feed) {
+  async function createFeed(feed: IFeed) {
     await tryCatch(async () => {
       const pos = await getPosition()
       const { audience, title, description } = feed
@@ -23,13 +24,13 @@ export default function useFeeds() {
         location
       })
       if (res.ok) {
-        const createdFeed = await res.json()
-        feedsctx.setFeeds({ [createdFeed._id]: createdFeed, ...feeds })
-        return createdFeed
+        const newFeed: IFeed = await res.json()
+        cache.add(newFeed)
+        return newFeed
       } else {
         console.log(
           'Error creating feed. Server responded with status code',
-          res.code
+          res.status
         )
         return null
       }
@@ -41,11 +42,10 @@ export default function useFeeds() {
       const res = await api.get('/feed')
       if (res.ok) {
         const data = await res.json()
-        const newFeeds = {}
+        const newFeeds: FeedCache = {}
         for (const feed of data) {
-          newFeeds[feed._id] = feed
+          cache.add(feed)
         }
-        feedsctx.setFeeds(newFeeds)
         return data
       }
     })

@@ -1,6 +1,6 @@
 import { useContext } from 'react'
 import { PostContext } from '../context/PostContext'
-import { useApi } from '../hooks/useApi'
+import { useApi } from './useApi'
 import { tryCatch } from '../util/err'
 
 export default function usePosts() {
@@ -10,7 +10,7 @@ export default function usePosts() {
   async function fetchHomePosts() {
     const [data, err] = await tryCatch(async () => {
       const res = await api.get('/home')
-      homePosts = await res.json()
+      const homePosts = await res.json()
       const posts = postctx.posts
       for (let post of homePosts) {
         posts[post._id] = post
