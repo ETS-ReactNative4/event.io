@@ -17,7 +17,7 @@
     "moment-timezone": "^0.5.27",
     "react": "16.9.0",
     "react-moment": "^0.9.6",
-    "react-native": "0.61.2",
+    "react-native": "0.62.3",
     "react-native-camera": "^3.7.2",
     "react-native-gesture-handler": "^1.4.1",
     "react-native-keyboard-aware-scroll-view": "^0.9.1",
